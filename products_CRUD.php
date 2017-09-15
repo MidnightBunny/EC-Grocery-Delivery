@@ -14,14 +14,16 @@
         $disc = 0;
         $storedFile="images/products/".basename($_FILES["img_save"]["name"]);
         move_uploaded_file($_FILES["file"]["tmp_name"], $storedFile);
-        mysql_query("INSERT into tbl_products VALUES('$bc','$pName','$cat','$scat','$supp',$sp,$lp,$disc,'$storedFile')") or die(mysql_error()); 
+        mysqli_query($open_connection,"INSERT into tbl_products VALUES('$bc','$pName','$cat','$scat','$supp',$sp,$lp,$disc,'$storedFile')") or die(mysqli_error($open_connection)); 
+        $id=mysqli_insert_id();
+        mysqli_query($open_connection,"INSERT into tbl_inventory(product_ID) VALUES($id)") or die(mysqli_error($open_connection)); 
         
-        echo"
+        /*echo"
 				<script type='text/javascript'>
 					alert('Product Successfully Added!');
 					open('products.php','_self');
 				</script>
-			";
+			"; */
 
 
       }
@@ -31,16 +33,16 @@
 		$category_name=$_POST['Category'];
 		echo $sc_val = $_POST['SC_v'];
 		$query1="SELECT * from tbl_category WHERE Category_Name='$category_name'";
-		$result1=mysql_query($query1);
-		$record=mysql_num_rows($result1);
+		$result1=mysqli_query($open_connection,$query1);
+		$record=mysqli_num_rows($result1);
 		if($record<=0){
 			$query2="INSERT into tbl_category(Category_Name)VALUES('$category_name')";
-			mysql_query($query2);
-			$id = mysql_insert_id();
+			mysqli_query($open_connection,$query2);
+			$id = mysqli_insert_id();
 			for($i=1; $i <= $sc_val ; $i++) { 
 				$sc = $_POST["SC{$i}"];
 				$query_sub = "INSERT into tbl_subcategory(Category_ID,SubCategory_Name)VALUES($id,'$sc')";
-				mysql_query($query_sub);
+				mysqli_query($open_connection,$query_sub);
 			} 
 			echo"
 				<script type='text/javascript'>

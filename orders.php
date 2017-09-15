@@ -17,8 +17,8 @@ else{
 ?>
 <!DOCTYPE html>
 <html>
-  <head>
-  	<title>Reports</title>
+ <head>
+  	<title>Orders</title>
     <meta charset="utf-8"> 
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <script src="Assets/js/jquery-1.10.2.min.js"></script>
@@ -30,107 +30,90 @@ else{
     <script src="Assets/bootstrap/js/jquery.min.js"></script>
     <script src="Assets/bootstrap/js/bootstrap.js"></script>
 
-  </head>
-  <body>
-    
-    <nav class="navbar navbar-default navbar-static-top" style="background-color: #7f0000;"">
-      <div class="container-fluid">
-        <!-- Brand and toggle get grouped for better mobile display -->
-        <div class="navbar-header">
-     
-          <img id="logo-img" style="height: 100px;width:100px;" class="logo-img" src="Assets/Images/EC.png"/>
-          <div style="margin-left: 100px;margin-top: -50px;">
-            <H4 style="color:white;"> EC NEW DEAL GROCERY </H4>
-          </div>
-        </div>
-        <div style="margin-top: 30px;margin-right: 20px;">
+    </head>
+  
 
-          <ul class="nav navbar-right">
-            <!-- <li><a href="http://www.pingpong-labs.com" target="_blank">Visit Site</a></li> -->
-            <li class="dropdown">
-              <a href="#" class="dropdown-toggle" style="color:white;" data-toggle="dropdown" role="button" aria-expanded="false">
-                Welcome, <?php echo "{$firstname} {$lastname}";?><span class="caret"></span>
-              </a>
-              <ul class="dropdown-menu" role="menu">
-                <li class="dropdown-header">SETTINGS</li>
-                <li><a href="#" data-toggle="modal" data-target="#accountSettings"><i class="fa fa-user fa-fw"></i>Profile</a></li>
-                <li class="divider"></li>
-                <li><a href="logout.php">Logout</a></li>
-              </ul>
-            </li>
-          </ul>
-        </div><!-- /.navbar-collapse -->
-      </div><!-- /.container-fluid -->
-    </nav>
-    <div class="container-fluid main-container">
-      <div class="col-md-2 sidebar">
-        <div class="row">
+<body>
+  <nav class="navbar navbar-default navbar-static-top" style="background-color: #7f0000;"">
+    <div class="container-fluid">
+      <!-- Brand and toggle get grouped for better mobile display -->
+      <div class="navbar-header">
+        <img id="logo-img" style="height: 100px;width:100px;" class="logo-img" src="Assets/Images/EC.png"/>
+        <div style="margin-left: 100px;margin-top: -50px;">
+          <H4 style="color:white;"> EC NEW DEAL GROCERY </H4>
+        </div>
+      </div>
+      <div style="margin-top: 30px;margin-right: 20px;">
+        <ul class="nav navbar-right">
+          <!-- <li><a href="http://www.pingpong-labs.com" target="_blank">Visit Site</a></li> -->
+          <li class="dropdown">
+            <a href="#" class="dropdown-toggle" style="color:white;" data-toggle="dropdown" role="button" aria-expanded="false">
+              Welcome, <?php echo "{$firstname} {$lastname}";?><span class="caret"></span>
+            </a>
+            <ul class="dropdown-menu" role="menu">
+              <li class="dropdown-header">SETTINGS</li>
+              <li><a href="#" data-toggle="modal" data-target="#accountSettings"><i class="fa fa-user fa-fw"></i>Profile</a></li>
+              <li class="divider"></li>
+              <li><a href="logout.php">Logout</a></li>
+            </ul>
+          </li>
+        </ul>
+      </div><!-- /.navbar-collapse -->
+    </div><!-- /.container-fluid -->
+  </nav>
+  <div class="container-fluid main-container">
+    <div class="col-md-2 sidebar">
+      <div class="row">
         <!-- uncomment code for absolute positioning tweek see top comment in css -->
-          <div class="absolute-wrapper"> </div>
-          <!-- Menu -->
-          <div class="side-menu">
-            <nav class="navbar navbar-default" role="navigation">
-              <!-- Main Menu -->
-              <div class="side-menu-container">
-                <ul class="nav navbar-nav">
-                  <li ><a href="dashboard.php"><span class="glyphicon glyphicon-dashboard"></span> Dashboard</a></li>
-                  <li><a href="category.php"><span class="fa fa-tasks"></span> Category</a></li>
-                  <li><a href="supplier.php"><span class="fa fa-truck"></span> Supplier</a></li>
-                  <li ><a href="products.php"><span class="fa fa-shopping-bag"></span> Items</a></li>
-                  <li><a href="inventory.php"><span class="fa fa-pie-chart"></span> Inventory</a></li>
-                  <li class="active"><a href="reports.php"><span class="glyphicon glyphicon-book"></span> Reports</a></li>
-                  <li><a href="orders.php"><span class="fa fa-list"></span> Orders</a></li>
-                  <li><a href="user.php"><span class="fa fa-user"></span> User Management</a></li>
-                </ul>
-              </div><!-- /.navbar-collapse -->
-            </nav>
-          </div>
+        <div class="absolute-wrapper"> </div>
+        <!-- Menu -->
+        <div class="side-menu">
+          <nav class="navbar navbar-default" role="navigation">
+            <!-- Main Menu -->
+            <div class="side-menu-container">
+              <ul class="nav navbar-nav">
+                <li ><a href="dashboard.php"><span class="glyphicon glyphicon-dashboard"></span> Dashboard</a></li>
+                <li><a href="category.php"><span class="fa fa-tasks"></span> Category</a></li>
+                <li><a href="supplier.php"><span class="fa fa-truck"></span> Supplier</a></li>
+                <li ><a href="products.php"><span class="fa fa-shopping-bag"></span> Items</a></li>
+                <li><a href="inventory.php"><span class="fa fa-pie-chart"></span> Inventory</a></li>
+                <li ><a href="reports.php"><span class="fa fa-database"></span> Reports</a></li>
+                <li class="active"><a href="orders.php"><span class="fa fa-list"></span> Orders</a></li>
+                <li><a href="user.php"><span class="fa fa-user"></span> User Management</a></li>
+              </ul>
+            </div><!-- /.navbar-collapse -->
+          </nav>
         </div>
       </div>
-      <div class="col-md-10 content">
-        <div>
-          <div class="panel panel-danger">
-            <div class="panel-heading">
-              <span class="glyphicon glyphicon-book"></span>Reports
-            </div>
-            <div class="panel-body">
-              <div class="col-md-10 content">
-                <iframe name='ifrm' id='ifrm' src="" style="width:100%;height: 500px;"></iframe>  
-              </div>
-              <div class="col-md-2 content">
-                <a href="pdf_productlist.php" onclick="return loadIframe('ifrm', this.href);">Product List</a><br>
-                <a href="pdf_supplierlist.php" onclick="return loadIframe('ifrm', this.href);">Supplier List</a><br>
-                <a href="pdf_productlist.php" onclick="return loadIframe('ifrm', this.href);">Daily Sales</a><br>
-                <a href="pdf_productlist.php" onclick="return loadIframe('ifrm', this.href);">Monthly Sales</a><br>
-                <a href="pdf_productlist.php" onclick="return loadIframe('ifrm', this.href);">Yearly Sales</a>  
-              </div>
-              
-            </div>
-            <div class="panel-footer">
-              <div class="row">
-                <div class="col-md-6">
-                  <h6>Kunware footer</h6>
-                </div>
+    </div>
+    <div class="col-md-10 content">
+      <div>
+        <div class="panel panel-danger">
+          <div class="panel-heading">
+            <span class="fa fa-list"></span>Orders
+          </div>
+          <div class="panel-body">
+                    
+          </div>
+          <div class="panel-footer">
+            <div class="row">
+              <div class="col-md-6">
+                <h6>Kunware footer</h6>
               </div>
             </div>
           </div>
         </div>
       </div>
-      <footer class="footer" style="text-align: center;">
-        <p class="col-md-12">
-          <hr class="divider">
-          Copyright &COPY; 2017 EC New Deal Grocery. All Rights Reserved.
-        </p>
-      </footer>
-      <script type="text/javascript">
-      function loadIframe(iframeName, url) {
-      var $iframe = $('#' + iframeName);
-      
-          $iframe.attr('src',url);   
-          return false;
-      }
-    </script>
-      <!-- ============================================================[ USER ACCOUNT SETTINGS ]==========================================================-->
+    </div>
+  </div>
+  <footer class="footer" style="text-align: center;">
+    <p class="col-md-12">
+      <hr class="divider">
+      Copyright &COPY; 2017 EC New Deal Grocery. All Rights Reserved.
+    </p>
+  </footer>
+    	
+    <!-- ============================================================[ USER ACCOUNT SETTINGS ]==========================================================-->
       <div  class="modal fade" id="accountSettings" tabindex="-1" role="dialog" >
         <div class="modal-dialog">
           <div class="modal-content modal-sm" style="margin-left:150px;">
@@ -204,8 +187,6 @@ else{
           }
           else{echo "<script type='text/javascript'>alert('incorrect old password!');</script>";}
         }
-      ?> 
-    </div>
-    
+      ?>
 	</body>
 </html>

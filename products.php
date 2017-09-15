@@ -13,27 +13,55 @@
           header("location:dashboard.php");
       } 
   //=========================================================[ ADD PRODUCT ]============================================================
-    if(isset($_POST['ProductSubmit']))
-       {
-        $bc=$_POST['barcode'];    
-        $pName=$_POST['ProductName'];
-        $cat=$_POST['select_cat'];
-        $scat=$_POST['radio_sc'];
-        $supp=$_POST['supp'];
-        $sp=$_POST['StandardPrice'];
-        $lp=$_POST['ListPrice'];
-        $disc = 0;
-        $storedFile="images/products/".basename($_FILES["file"]["name"]);
-        move_uploaded_file($_FILES["file"]["tmp_name"], $storedFile);
-        mysql_query("INSERT into tbl_products(`barcode`, `product_name`, `Category_ID`, `SCat_ID`, `supplier_ID`, `standard_price`, `list_price`, `discontinue`, `image`)VALUES('$bc','$pName','$cat','$scat','$supp',$sp,$lp,$disc,'$storedFile')") or die(mysql_error()); 
-        
-
+  if(isset($_POST['ProductSubmit']))
+    {
+      $bc=$_POST['barcode'];    
+      $pName=$_POST['ProductName'];
+      $cat=$_POST['select_cat'];
+      $scat=$_POST['radio_sc2'];
+      $supp=$_POST['supp'];
+      $sp=$_POST['StandardPrice'];
+      $lp=$_POST['ListPrice'];
+      $disc = 0;
+      $storedFile="images/products/".basename($_FILES["file"]["name"]);
+      move_uploaded_file($_FILES["file"]["tmp_name"], $storedFile);
+      mysqli_query($open_connection,"INSERT into tbl_products(`barcode`, `product_name`, `Category_ID`, `SCat_ID`, `supplier_ID`, `standard_price`, `list_price`, `discontinue`, `image`)VALUES('$bc','$pName','$cat','$scat','$supp',$sp,$lp,$disc,'$storedFile')") or die(mysqli_error($open_connection));
+      $id=mysqli_insert_id($open_connection);
+      mysqli_query($open_connection,"INSERT into tbl_inventory(product_ID) VALUES($id)") or die(mysqli_error($open_connection));  
+    }
+  //=========================================================[ EDIT PRODUCT ]============================================================
+  if(isset($_POST['ProductEdit']))
+    {
+      $bc=$_POST['barcode'];  
+      $pID=$_POST['productID'];    
+      $pName=$_POST['ProductName'];
+      $cat=$_POST['select_cat'];
+      $scat=$_POST['radio_sc'];
+      $supp=$_POST['supp'];
+      $sp=$_POST['StandardPrice'];
+      $lp=$_POST['ListPrice'];
+      $ds=$_POST['check_dis'];
+      if ($ds == 'YES') {
+        $disc = 1;
       }
+      else{
+        $disc = 0;
+      }
+      $storedFile="images/products/".basename($_FILES["file"]["name"]);
+      if ($storedFile == "images/products/") {
+        # code...
+      }
+      else{
+        move_uploaded_file($_FILES["file"]["tmp_name"], $storedFile);
+        mysqli_query($open_connection,"UPDATE tbl_products SET `barcode`='$bc',`product_name`='$pName',`Category_ID`=$cat,`supplier_ID`=$supp,`standard_price`=$sp,`list_price`=$lp,`discontinue`=$disc,`image`='$storedFile' WHERE product_ID=$pID"); 
+      }
+      
+    }
 ?>
 <!DOCTYPE html>
 <html>
  <head>
-  	<title>Dashboard</title>
+  	<title>Product</title>
     <meta charset="utf-8"> 
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <script src="Assets/js/jquery-1.10.2.min.js"></script>
@@ -44,10 +72,27 @@
     <script src="Assets/js/admin_style.js"></script>
     <script src="Assets/bootstrap/js/jquery.min.js"></script>
     <script src="Assets/bootstrap/js/bootstrap.js"></script>
-    <script>
-      function showUser(str) {
+    <script type="text/javascript" src="js/shieldui-all.min.js"></script>
+    <script type="text/javascript" src="js/gridData.js"></script>
+
+    <link rel="stylesheet" type="text/css" href="DataTables/css/dataTables.bootstrap.min.css" />
+    <link rel="stylesheet" type="text/css" href="DataTables/css/jquery.dataTables.min.css" />
+
+    <script type="text/javascript" src="DataTables/js/jquery.dataTables.min.js"></script>   
+    <script type="text/javascript" src="DataTables/js/dataTables.bootstrap.min.js"></script>  
+    <script type="text/javascript">
+
+    $(document).ready( function() {
+      $('#myTable').dataTable({
+        /* No ordering applied by DataTables during initialisation */
+        "order": []; });
+          }
+          )
+    </script>
+
+    <script type="text/javascript">
+      function showCat(str) {
           if (str == "") {
-              document.getElementById("txtHint").innerHTML = "";
               return;
           } else { 
               if (window.XMLHttpRequest) {
@@ -63,6 +108,28 @@
                   }
               };
               xmlhttp.open("GET","getcategory.php?q="+str,true);
+              xmlhttp.send();
+          }
+      }
+
+      function showUser2(str) {
+          if (str == "") {
+              document.getElementById("txtHint2").innerHTML = "";
+              return;
+          } else { 
+              if (window.XMLHttpRequest) {
+                  // code for IE7+, Firefox, Chrome, Opera, Safari
+                  xmlhttp = new XMLHttpRequest();
+              } else {
+                  // code for IE6, IE5
+                  xmlhttp = new ActiveXObject("Microsoft.XMLHTTP");
+              }
+              xmlhttp.onreadystatechange = function() {
+                  if (this.readyState == 4 && this.status == 200) {
+                      document.getElementById("txtHint2").innerHTML = this.responseText;
+                  }
+              };
+              xmlhttp.open("GET","getcategory2.php?q="+str,true);
               xmlhttp.send();
           }
       }
@@ -116,7 +183,7 @@
         }
         function number3(e) 
         { 
-            var key; var keychar; 
+            var key; var keychar; var a;
                 if (window.event) 
                     key = window.event.keyCode; 
                 else if (e) 
@@ -124,8 +191,10 @@
                 else return true; 
                 keychar = String.fromCharCode(key); 
                 keychar = keychar.toLowerCase(); 
-                if ((("0123456789.").indexOf(keychar) > -1))
-                    return true; 
+                if ((("0123456789.").indexOf(keychar) > -1)){
+                  return true;
+                }
+                     
                 else 
                     return false; 
         }   
@@ -166,13 +235,13 @@
     </head>
   
 
-  <body>
-    <nav class="navbar navbar-default navbar-static-top" style="background-color: #7f0000;"">
-    <div class="container-fluid">
-      <!-- Brand and toggle get grouped for better mobile display -->
-    <div class="navbar-header">
+  <body >
+    <nav class="navbar navbar-default navbar-static-top" style="background-color: #7f0000;>
+      <div class="container-fluid">
+        <!-- Brand and toggle get grouped for better mobile display -->
+        <div class="navbar-header">
      
-       <img id="logo-img" style="height: 100px;width:100px;" class="logo-img" src="Assets/Images/ec.png"/>
+       <img id="logo-img" style="height: 100px;width:100px;" class="logo-img" src="Assets/Images/EC.png"/>
        <div style="margin-left: 100px;margin-top: -50px;">
        <H4 style="color:white;"> EC NEW DEAL GROCERY </H4>
        </div>
@@ -183,11 +252,11 @@
         <!-- <li><a href="http://www.pingpong-labs.com" target="_blank">Visit Site</a></li> -->
         <li class="dropdown">
           <a href="#" class="dropdown-toggle" style="color:white;" data-toggle="dropdown" role="button" aria-expanded="false">
-              Welcome, <?php echo $userlevel." ".$firstname." ".$lastname;?>
+              Welcome, <?php echo "{$firstname} {$lastname}";?>
               <span class="caret"></span></a>
               <ul class="dropdown-menu" role="menu">
                 <li class="dropdown-header">SETTINGS</li>
-                <li><a href="#" data-toggle="modal" data-target="#accountSettings"><i class="fa fa-user fa-fw"></i>User Accounts</li>
+                <li><a href="#" data-toggle="modal" data-target="#accountSettings"><i class="fa fa-user fa-fw"></i>Profile</li>
                
                 <li class="divider"></li>
                 <li><a href="logout.php">Logout</a></li>
@@ -207,14 +276,15 @@
             <nav class="navbar navbar-default" role="navigation">
               <!-- Main Menu -->
               <div class="side-menu-container">
-                <ul class="nav navbar-nav">
+                <ul class="nav navbar-nav" >
                   <li ><a href="dashboard.php"><span class="glyphicon glyphicon-dashboard"></span> Dashboard</a></li>
-                  <li><a href="user.php"><span class="fa fa-user"></span> User Management</a></li>
                   <li><a href="category.php"><span class="fa fa-tasks"></span> Category</a></li>
                   <li><a href="supplier.php"><span class="fa fa-truck"></span> Supplier</a></li>
                   <li class="active"><a href="products.php"><span class="fa fa-shopping-bag"></span> Items</a></li>
                   <li><a href="inventory.php"><span class="fa fa-pie-chart"></span> Inventory</a></li>
                   <li><a href="reports.php"><span class="fa fa-database"></span> Reports</a></li>
+                  <li><a href="orders.php"><span class="fa fa-list"></span> Orders</a></li>
+                  <li><a href="user.php"><span class="fa fa-user"></span> User Management</a></li>
                </ul>
             </div><!-- /.navbar-collapse -->
           </nav>
@@ -227,10 +297,13 @@
         <div>
           <div class="panel panel-danger">
             <div class="panel-heading">
-              <span class="glyphicon glyphicon-list"></span>Products
+              <span class="fa fa-shopping-bag"></span>Products
             </div>
             <div class="panel-body">
-              <table class="table table-stripped table-hover">
+              <form method="POST">
+                    
+              </form>
+              <table class="table table-striped" style="font-size:14px;" id="myTable"> 
                 <thead>
                   <tr>
                     <th>Barcode</th>
@@ -241,21 +314,25 @@
                     <th>Standard Price</th>
                     <th>List Price</th>
                     <th>Status</th>
-                    <th>View</th>
-                    <th>Edit</th>
+                    <th>Actions</th>
+                    
                   </tr>
                 </thead>
                 <tr>
                 <?php 
-                          $sql_display="SELECT product_ID,barcode,product_name,Category_Name,SubCategory_Name,supplier_name,standard_price,list_price,discontinue,image FROM `tbl_products` INNER JOIN tbl_category USING(`Category_ID`) INNER JOIN tbl_subcategory USING (`SCat_ID`) Inner JOIN tbl_supplier USING (`supplier_ID`)";
-                          $display_users=mysql_query($sql_display) or die(mysql_error());
+                          $sql_display="SELECT product_ID,barcode,product_name,p.Category_ID,Category_Name,p.SCat_ID,SubCategory_Name,s.supplier_ID,supplier_name,standard_price,list_price,discontinue,image FROM tbl_products p INNER JOIN tbl_category USING(`Category_ID`) INNER JOIN tbl_subcategory USING (`SCat_ID`) Inner JOIN tbl_supplier s USING (`supplier_ID`) ORDER BY product_ID ASC";
+                          
+                          $display_users=mysqli_query($open_connection,$sql_display) or die(mysqli_error($open_connection));
                             
-                            while($row=mysql_fetch_array($display_users)){
+                            while($row=mysqli_fetch_array($display_users)){
                               $id = $row['product_ID'];
                               $bc=$row['barcode'];
                               $pn=$row['product_name'];
+                              $cid=$row['Category_ID'];
                               $cn=$row['Category_Name'];
+                              $sid=$row['SCat_ID'];
                               $scn=$row['SubCategory_Name'];
+                              $suid=$row['supplier_ID'];
                               $sn=$row['supplier_name'];
                               $sp=$row['standard_price'];
                               $lp=$row['list_price'];
@@ -271,98 +348,15 @@
                   <td><?php echo $sp; ?></td>
                   <td><?php echo $lp; ?></td>
                   <td><?php if ($disc == 0) {echo "Available";}else{echo "Discontinued";}  ?></td>
+                  <?php //$test = json_encode(array("a"=>$id,"b"=>$bc,"c"=>$pn,"d"=>$cn,"e"=>$scn,"f"=>$sp,"g"=>$lp,"h"=>$disc,"i"=>$img_display)); ?>
+                  <?php $test = '['.$id.',"'.$bc.'","'.$pn.'",'.$cid.','.$sid.','.$suid.','.$disc.','.$sp.','.$lp.',"'.$img_display.'"]'; ?>
                   <td>
                     <a data-target="#viewModal<?php echo $id; ?>" class="btn btn-success btn-sm" title="Edit Menu" data-toggle="modal" ><i class="fa fa-eye"></i></a>
-                  </td>
-                  <td>
-                    <a data-target="#editModal<?php echo $id; ?>" class="btn btn-success btn-sm" title="Edit Menu" data-toggle="modal" ><i class="fa fa-pencil"></i></a>
+                  
+                    <a data-target="#editModal" class="btn btn-success btn-sm" title="Edit Menu" data-toggle="modal" data-id=<?php echo '\'', $test,'\''; ?> ><i class="fa fa-pencil"></i></a>
                   </td>
                 </tr>
-                <div id="editModal<?php echo $id; ?>" class="modal fade" role="dialog">
-                 <div class="modal-dialog">
-                  <!-- Modal content-->
-                  <div class="modal-content">
-                    <div class="modal-header">
-                      <button type="button" class="close" data-dismiss="modal">&times;</button>
-                      <h4 class="modal-title">Add New Product</h4>
-                    </div>
-                    <div class="modal-body">
-                      <form class="form-signin" method="post" enctype="multipart/form-data">
-                        <div class="form-group">
-                          <div class="row">
-                            <div class="col-md-6">
-                              <div class="col-md-12">
-                                <label>Barcode</label>
-                                <input type="text" class="form-control" id="barcode" name="barcode" placeholder="Barcode" onmouseover="this.focus();" tabindex="1" onKeyPress="return number(event)" value="<?php echo $bc; ?>">  
-                              </div>
-                              <div class="col-md-12">
-                              <label>Product Name</label>   
-                              <input type="text" class="form-control" id="ProductName" name="ProductName" placeholder="Product Name" tabindex="3" value="<?php echo $pn; ?>">
-                            </div>
-                               
-                            </div>
-                            
-                            
-                            <div class="col-md-6">
-                                <div class="input-group">
-                                  <img src="<?php echo $img_display; ?>" style="width:100px;height:100px">
-                                  <input type="file" name="">
-                                </div>            
-                              </div> 
-                            <div class="col-md-12">
-                              <label>Catergory</label>
-                              <select class="form-control" name="select_cat" id="select_cat" tabindex="4" onchange="showUser(this.value)" required >
-                                <option value="" disabled selected>Select Category</option>
-                                  <?php 
-                                    $display_cat=mysql_query("SELECT * FROM tbl_category") or die(mysql_error());
-                                    $i=1;
-                                    while($row=mysql_fetch_array($display_cat)){
-                                      $Cat_ID=$row['Category_ID'];
-                                      $Cat_Name=$row['Category_Name'];
-                                  ?>
-                                <option value="<?php echo $Cat_ID; ?>"><?php echo $Cat_Name; ?></option>
-                                <?php } ?>        
-                              </select>     
-                            </div>
-                            <div class="col-md-12">
-                              <div id="txtHint"></div>       
-                            </div>
-                            <div class="col-md-12">
-                              <label>Supplier</label>
-                              <select class="form-control" id="supp" name="supp" tabindex="6">
-                                <option value="" disabled selected>Select Supplier</option>
-                                  <?php 
-                                    $display_supplier=mysql_query("SELECT * FROM tbl_supplier") or die(mysql_error());
-                                    $i=1;
-                                    while($row=mysql_fetch_array($display_supplier)){
-                                      $Supplier_ID=$row['supplier_ID'];
-                                      $Supp_Name=$row['supplier_name'];
-                                  ?>
-                                <option value="<?php echo $Supplier_ID; ?>"><?php echo $Supp_Name; ?></option>
-                                  <?php } ?> 
-                              </select>       
-                            </div>
-                            <div class="col-md-12">
-                              <div class="form-group">
-                                <label>Standard Price</label>
-                                <input type="number" class="form-control" id="StandardPrice" name="StandardPrice" placeholder="Standard Price" tabindex="7" onKeyPress="return number3(event)" value="<?php echo $sp; ?>">
-                                <label >List Price</label>
-                                <input type="number" class="form-control" id="ListPrice" name="ListPrice" placeholder="List Price" tabindex="8" onKeyPress="return number3(event)" value="<?php echo $lp; ?>">
-                              </div>         
-                            </div>  
-                            <div class="col-md-2">
-                              <button type="submit" name="ProductSubmit" class="btn btn-default" tabindex="9">Submit</button>
-                            </div>
-                          </div>
-                        </div>  
-                      </form>
-                    </div>
-                    <div class="modal-footer">
-                      <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-                    </div>
-                  </div>
-                </div> 
-              </div>
+                
               <div id="viewModal<?php echo $id; ?>" class="modal fade" role="dialog">
                  <div class="modal-dialog">
                   <!-- Modal content-->
@@ -377,41 +371,37 @@
                           <div class="row">
                             <div class="col-md-6">
                               <label>Barcode</label>
-                              <input type="text" class="form-control" id="barcode" name="barcode" placeholder="Barcode" onmouseover="this.focus();" tabindex="1" onKeyPress="return number(event)" value="<?php echo $bc; ?>">  
+                              <input type="text" class="form-control" id="barcode" name="barcode" placeholder="Barcode" tabindex="1" onKeyPress="return number(event)" value="<?php echo $bc; ?>" style="background-color:white;" readonly>  
+                              <label>Product Name</label>   
+                              <input type="text" class="form-control" id="ProductName" name="ProductName" placeholder="Product Name" tabindex="3" value="<?php echo $pn; ?>" style="background-color:white;" readonly>
                             </div>
                             <div class="col-md-6">
                               <div class="input-group">
                                 <img src="<?php echo $img_display; ?>" style="width:100px;height:100px">
-                                <input type="file" name="">
+                                
                               </div>            
-                            </div>
-                            <div class="col-md-6">
-                              <label>Product Name</label>   
-                              <input type="text" class="form-control" id="ProductName" name="ProductName" placeholder="Product Name" tabindex="3" value="<?php echo $pn; ?>">
                             </div>
                             <div class="col-md-12">
                               <label>Catergory</label>
-                              <input type="text" class="form-control" name="c_name" value="<?php echo $cn; ?>">    
+                              <input type="text" class="form-control" name="c_name" value="<?php echo $cn; ?>" style="background-color:white;" readonly>    
                             </div>
                             <div class="col-md-12">
                               <label>Sub Catergory</label>
-                              <input type="text" class="form-control" name="sc_name" value="<?php echo $scn; ?>">    
+                              <input type="text" class="form-control" name="sc_name" value="<?php echo $scn; ?>" style="background-color:white;" readonly>    
                             </div>
                             <div class="col-md-12">
                               <label>Supplier</label>
-                              <input type="text" class="form-control" name="sc_name" value="<?php echo $sn; ?>">       
+                              <input type="text" class="form-control" name="sc_name" value="<?php echo $sn; ?>" style="background-color:white;" readonly>       
                             </div>
                             <div class="col-md-12">
                               <div class="form-group">
                                 <label>Standard Price</label>
-                                <input type="number" class="form-control" id="StandardPrice" name="StandardPrice" placeholder="Standard Price" tabindex="7" onKeyPress="return number3(event)" value="<?php echo $sp; ?>">
+                                <input type="text" class="form-control" id="StandardPrice" name="StandardPrice" placeholder="Standard Price" tabindex="7" value="<?php echo $sp; ?>" style="background-color:white;" readonly>
                                 <label >List Price</label>
-                                <input type="number" class="form-control" id="ListPrice" name="ListPrice" placeholder="List Price" tabindex="8" onKeyPress="return number3(event)" value="<?php echo $lp; ?>">
+                                <input type="text" class="form-control" id="ListPrice" name="ListPrice" placeholder="List Price" tabindex="8" value="<?php echo $lp; ?>" style="background-color:white;" readonly>
                               </div>         
                             </div>  
-                            <div class="col-md-2">
-                              <button type="submit" name="ProductSubmit" class="btn btn-default" tabindex="9">Submit</button>
-                            </div>
+                            
                           </div>
                         </div>  
                       </form>
@@ -464,7 +454,7 @@
                     </div>  
                     <div class="col-md-12">
                       <label>Product Name</label>   
-                      <input type="text" class="form-control" id="ProductName" name="ProductName" placeholder="Product Name" tabindex="3">
+                      <input type="text" class="form-control" id="ProductName" name="ProductName" placeholder="Product Name" tabindex="3" onkeypress="return lenum(event)">
                     </div>
                   </div>
                   
@@ -477,12 +467,12 @@
                   
                   <div class="col-md-12">
                     <label>Catergory</label>
-                    <select class="form-control" name="select_cat" id="select_cat" tabindex="4" onchange="showUser(this.value)" required>
+                    <select class="form-control" name="select_cat" id="select_cat" tabindex="4" onchange="showUser2(this.value)">
                       <option value="" disabled selected>Select Category</option>
                         <?php 
-                          $display_cat=mysql_query("SELECT * FROM tbl_category") or die(mysql_error());
+                          $display_cat=mysqli_query($open_connection,"SELECT * FROM tbl_category") or die(mysqli_error($open_connection));
                           $i=1;
-                          while($row=mysql_fetch_array($display_cat)){
+                          while($row=mysqli_fetch_array($display_cat)){
                             $Cat_ID=$row['Category_ID'];
                             $Cat_Name=$row['Category_Name'];
                         ?>
@@ -491,16 +481,16 @@
                     </select>     
                   </div>
                   <div class="col-md-12">
-                    <div id="txtHint"></div>       
+                    <div id="txtHint2"></div>       
                   </div>
                   <div class="col-md-12">
                     <label>Supplier</label>
                     <select class="form-control" id="supp" name="supp" tabindex="6">
                       <option value="" disabled selected>Select Supplier</option>
                         <?php 
-                          $display_supplier=mysql_query("SELECT * FROM tbl_supplier") or die(mysql_error());
+                          $display_supplier=mysqli_query($open_connection,"SELECT * FROM tbl_supplier") or die(mysqli_error($open_connection));
                           $i=1;
-                          while($row=mysql_fetch_array($display_supplier)){
+                          while($row=mysqli_fetch_array($display_supplier)){
                             $Supplier_ID=$row['supplier_ID'];
                             $Supp_Name=$row['supplier_name'];
                         ?>
@@ -511,9 +501,9 @@
                   <div class="col-md-12">
                     <div class="form-group">
                       <label>Standard Price</label>
-                      <input type="number" class="form-control" id="StandardPrice" name="StandardPrice" placeholder="Standard Price" tabindex="7" onKeyPress="return number3(event)">
+                      <input type="text" class="form-control" id="StandardPrice" name="StandardPrice" placeholder="Standard Price" tabindex="7" onKeyPress="return number3(event)">
                       <label >List Price</label>
-                      <input type="number" class="form-control" id="ListPrice" name="ListPrice" placeholder="List Price" tabindex="8" onKeyPress="return number3(event)">
+                      <input type="text" class="form-control" id="ListPrice" name="ListPrice" placeholder="List Price" tabindex="8" onKeyPress="return number3(event)">
                     </div>         
                   </div>  
                   <div class="col-md-2">
@@ -529,81 +519,175 @@
         </div>
       </div> 
     </div>
-
-   <!-- USER ACCOUNT SETTINGS-->
-                 
-                  <div  class="modal fade" id="accountSettings" tabindex="-1" role="dialog" >
-                    <div class="modal-dialog">
-                      <div class="modal-content modal-sm" style="margin-left:150px;">
-                        <div class="modal-header"> <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-                          <h4 class="modal-title">Account Settings</h4>
-                        </div>
-                            <div class="modal-body" >
-                            <form method="post">
-                            <div class="row">
-                                <div class="col-sm-12">
-                                  <div class="input-group">
-                                    <div>
-                                        <label class="form-label">
-                                        Username
-                                        </label> 
-                                    </div>
-                                    <input type="hidden" name="ids" value="<?php echo $ids?>" class="form-control" style="margin-bottom:10px;">
-                                    <input type="text" name="username" value="<?php echo $usernames; ?>" class="form-control" style="margin-bottom: 10px;">
-                                      <label class="form-label">
-                                        Old Password
-                                      </label>
-                                      <input type="hidden" name="passwords" value="<?php echo $passwords; ?>">
-                                      <input type="text"  name="old_password" id="old_password" placeholder="Enter Old Password" class="form-control" aria-describedby="basic-addon1" >
-                                      <hr/>
-                                      <label>
-                                        New Password
-                                      </label>
-                                      <input type="password"  name="new_password" id="new_password" placeholder="Enter New Passoword" class="form-control" aria-describedby="basic-addon1" style="margin-bottom: 10px;">
-                                    <input type="password"  name="confirm_password" id="confirm_password" placeholder="Confirm Password" class="form-control" aria-describedby="basic-addon1" style="margin-bottom: 10px;">
-                                  </div>
-                                </div> 
-                                <div style="text-align: center;"><input type="submit" class="btn btn-success" name="btn_save_new_password">
-                                </div>
+    <!-- =============================================================[ EDIT PRODUCT ]======================================================================-->
+    <div id="editModal" class="modal fade" role="dialog">
+                 <div class="modal-dialog">
+                  <!-- Modal content-->
+                  <div class="modal-content">
+                    <div class="modal-header">
+                      <button type="button" class="close" data-dismiss="modal">&times;</button>
+                      <h4 class="modal-title">Edit Product Information</h4>
+                    </div>
+                    <div class="modal-body">
+                      <form class="form-signin" method="post" enctype="multipart/form-data">
+                        <div class="form-group">
+                          <div class="row">
+                            <input type="hidden" name="productID">
+                            <div class="col-md-6">
+                              <div class="col-md-12">
+                                <label>Barcode</label>
+                                <input type="text" class="form-control" id="barcode" name="barcode" placeholder="Barcode" onmouseover="this.focus();" tabindex="1" onKeyPress="return number(event)" value="<?php echo $bc; ?>">  
+                              </div>
+                              <div class="col-md-12">
+                              <label>Product Name</label>   
+                              <input type="text" class="form-control" id="ProductName" name="ProductName" placeholder="Product Name" tabindex="3" value="<?php echo $pn; ?>">
+                            </div>     
+                          </div>
+                            
+                            
+                            <div class="col-md-6">
+                                <div class="input-group">
+                                  <img name="img_display" id="img_display"  style="width:100px;height:100px">
+                                  <input type="file" name="file">
+                                </div>            
+                              </div> 
+                            <div class="col-md-12">
+                              <label>Catergory</label>
+                              <select class="form-control" name="select_cat" id="select_cat" tabindex="4" onchange="showCat(this.value)"  onload="test()" >
+                                <option value="null" disabled selected>Select Category</option>
+                                  <?php 
+                                    $display_cat=mysqli_query($open_connection,"SELECT * FROM tbl_category") or die(mysqli_error($open_connection));
+                                    $i=1;
+                                    while($row=mysqli_fetch_array($display_cat)){
+                                      $Cat_ID=$row['Category_ID'];
+                                      $Cat_Name=$row['Category_Name'];
+                                  ?>
+                                <option value="<?php echo $Cat_ID; ?>"><?php echo $Cat_Name; ?></option>
+                                <?php } ?>        
+                              </select>     
+                            </div>
+                            <div class="col-md-12">
+                              <div id="txtHint"></div>       
+                            </div>
+                            <div class="col-md-12">
+                              <label>Supplier</label>
+                              <select class="form-control" id="supp" name="supp" tabindex="6">
+                                <option value="" disabled selected>Select Supplier</option>
+                                  <?php 
+                                    $display_supplier=mysqli_query($open_connection,"SELECT * FROM tbl_supplier") or die(mysqli_error($open_connection));
+                                    $i=1;
+                                    while($row=mysqli_fetch_array($display_supplier)){
+                                      $Supplier_ID=$row['supplier_ID'];
+                                      $Supp_Name=$row['supplier_name'];
+                                  ?>
+                                <option value="<?php echo $Supplier_ID; ?>"><?php echo $Supp_Name; ?></option>
+                                  <?php } ?> 
+                              </select>       
+                            </div>
+                            <div class="col-md-12">
+                              <div class="form-group">
+                                <label>Discontinued</label>
+                                <input type="checkbox" name="check_dis" id="check_dis" value="YES" >  
                               </div>
                             </div>
-                            </form>
+                            <div class="col-md-12">
+                              <div class="form-group">
+                                <label>Standard Price</label>
+                                <input type="number" class="form-control" id="StandardPrice" name="StandardPrice" placeholder="Standard Price" tabindex="7" onKeyPress="return number3(event)" step="any" value="<?php echo $sp; ?>">
+                                <label >List Price</label>
+                                <input type="number" class="form-control" id="ListPrice" name="ListPrice" placeholder="List Price" tabindex="8" onKeyPress="return number3(event)" value="<?php echo $lp; ?>">
+                              </div>         
+                            </div>  
+                            <div class="col-md-2">
+                              <button type="submit" name="ProductEdit" class="btn btn-default" tabindex="9">Submit</button>
                             </div>
-                            </div>
-                            </div>
-
-                            
-                            <?php 
-                               if(isset($_POST['btn_save_new_password']))
-                                {
-                                 $username = $_POST['username'];
-                                 $passwords = $_POST['passwords'];
-                                 $old_password = $_POST['old_password'];
-                                 $new_password = $_POST['new_password'];
-                                 $confirm_password = $_POST['confirm_password'];
-
-                                 if($passwords == $old_password)
-                                 {
-                                  if($new_password == $confirm_password)
-                                  {
-                                   
-                                   $query1= mysql_query("UPDATE tbl_users SET username='$username', password='$new_password' WHERE id='$ids'") or die (mysql_error());
-
-                                    echo "<script type='text/javascript'>alert('SUCCESS!');</script>";
-                                  }
-                                  else
-                                  {
-                                    echo "<script type='text/javascript'>alert('NEW PASSWORD AND CONFIRM PASSWORD NOT THE SAME!');</script>";
-                                  }
-                                 }
-                                  else
-                                  {
-                                    echo "<script type='text/javascript'>alert('incorrect old password!');</script>";
-                                  }
-                                }
-                            ?>
+                          </div>
+                        </div>  
+                      </form>
+                    </div>
+                    <div class="modal-footer">
+                      <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                    </div>
+                  </div>
+                </div> 
+              </div>
+    <!-- ============================================================[ USER ACCOUNT SETTINGS ]==========================================================-->
+    <div  class="modal fade" id="accountSettings" tabindex="-1" role="dialog" >
+      <div class="modal-dialog">
+        <div class="modal-content modal-sm" style="margin-left:150px;">
+          <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+            <h4 class="modal-title">Account Settings</h4>
+          </div>
+          <div class="modal-body" >
+            <form method="post">
+              <div class="row">
+                <div class="col-sm-12">
+                  <div class="input-group">
+                    <div>
+                      <label class="form-label">Username</label> 
+                    </div>
+                    <input type="hidden" name="ids" value="<?php echo $ids?>" class="form-control" style="margin-bottom:10px;">
+                    <input type="text" name="username" value="<?php echo $usernames; ?>" class="form-control" style="margin-bottom: 10px;">
+                    <label class="form-label">Old Password</label>
+                    <input type="hidden" name="passwords" value="<?php echo $passwords; ?>">
+                    <input type="password"  name="old_password" id="old_password" placeholder="Enter Old Password" class="form-control" aria-describedby="basic-addon1" >
+                    <hr/>
+                    <label>New Password</label>
+                    <input type="password"  name="new_password" id="new_password" placeholder="Enter New Passoword" class="form-control" aria-describedby="basic-addon1" style="margin-bottom: 10px;">
+                    <input type="password"  name="confirm_password" id="confirm_password" placeholder="Confirm Password" class="form-control" aria-describedby="basic-addon1" style="margin-bottom: 10px;">
+                  </div>
+                </div> 
+                <div style="text-align: center;"><input type="submit" class="btn btn-success" name="btn_save_new_password"></div>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+    <?php 
+      if(isset($_POST['btn_save_new_password'])){
+        $username = $_POST['username'];
+        $passwords = $_POST['passwords'];
+        $old_password = $_POST['old_password'];
+        $new_password = $_POST['new_password'];
+        $confirm_password = $_POST['confirm_password'];
+        $UC = false;
+        $LC = false;
+        $NUM = false;
+        if($passwords == $old_password){
+          if($new_password == $confirm_password){
+            for ($i=0; $i < strlen($new_password); ++$i) { 
+              $b=$new_password[$i];
+              if (ctype_upper($b)) {
+                $UC = true;
+              }
+              elseif (ctype_lower($b)) {
+                $LC = true;
+              }
+              elseif (ctype_digit($b)) {
+                $NUM = true;
+              }
+            }
+            if (strlen($confirm_password) < 8) {
+              echo "<script type='text/javascript'> alert ('Password must be at least 8 character long!'); </script>";
+            }
+            elseif ($UC && $LC && $NUM ) {
+              $pass = md5($new_password);
+              $query1= mysqli_query($open_connection,"UPDATE tbl_users SET username='$username', password='$pass' WHERE id='$ids'") or die (mysqli_error($open_connection));
+              echo "<script type='text/javascript'>alert('Password Successfully Change!');</script>";
+            }
+            else {
+              echo "<script type='text/javascript'> alert ('Password must have at least an uppercase letter, a lowercase letter and a number! '); </script>";
+            }
+          }
+          else{echo "<script type='text/javascript'>alert('NEW PASSWORD AND CONFIRM PASSWORD NOT THE SAME!');</script>";}
+        }
+        else{echo "<script type='text/javascript'>alert('incorrect old password!');</script>";}
+      }
+    ?>
          <!-- =================================[ SCRIPTS ]=========================-->   
-         <script type="text/javascript">
+        <script type="text/javascript">
            $('input,select').on('keypress', function (e) {
               if (e.which == 13) {
                   e.preventDefault();
@@ -615,6 +699,35 @@
                   $next.focus();
               }
           });
-         </script>       
+        </script>
+        <script type="text/javascript">
+            $('#editModal').on('show.bs.modal', function(e) {
+              var Users = $(e.relatedTarget).data('id');
+              $(e.currentTarget).find('input[name="productID"]').val( Users[0] );
+              $(e.currentTarget).find('input[name="barcode"]').val( Users[1] );
+              $(e.currentTarget).find('input[name="ProductName"]').val( Users[2]);
+              $(e.currentTarget).find('select[name="select_cat"]').val( Users[3] );
+            
+
+              $(e.currentTarget).find('select[name="supp"]').val( Users[5] );
+              if (Users[6] == 1) {
+                document.getElementById("check_dis").checked = true;  
+              }
+              else{
+                document.getElementById("check_dis").checked = false;
+              }
+              
+              
+              $(e.currentTarget).find('input[name="StandardPrice"]').val( Users[7] );
+              $(e.currentTarget).find('input[name="ListPrice"]').val( Users[8] );
+              var src1 = Users[9];
+              $("#img_display").attr("src",src1);
+              
+
+
+            });
+
+            
+          </script>       
   </body>
 </html>
