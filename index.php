@@ -31,7 +31,7 @@
             
         </form><!-- /form -->
         <div class="signin-help">
-            <p>forgot your password? <a href="#">click here</a></p>
+            <p>forgot your password? <a href="forgotpw.php">click here</a></p>
         </div>
     </div>
 </div>

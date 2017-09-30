@@ -16,21 +16,21 @@
   
   if(isset($_POST['deleteCat'])){
       $no=$_POST['Cate_ID'];
-        mysql_query("DELETE from tbl_category WHERE Category_ID='$no'") or die(mysql_error());
-        mysql_query("DELETE from tbl_subcategory WHERE Category_ID='$no'") or die(mysql_error());
+        mysqli_query($open_connection,"DELETE from tbl_category WHERE Category_ID='$no'") or die(mysqli_error($open_connection));
+        mysqli_query($open_connection,"DELETE from tbl_subcategory WHERE Category_ID='$no'") or die(mysqli_error($open_connection));
         //header("location:category.php");
   }
 
   if(isset($_POST['deleteSCat'])){
     $no=$_POST['SCate_ID'];
-    mysql_query("DELETE from tbl_subcategory WHERE SCat_ID='$no'") or die(mysql_error());;
+    mysqli_query($open_connection,"DELETE from tbl_subcategory WHERE SCat_ID='$no'") or die(mysqli_error($open_connection));;
     //header("location:category.php");
   }
 ?>
 <!DOCTYPE html>
 <html>
   <head>
-  	<title>Dashboard</title>
+    <title>Dashboard</title>
     <meta charset="utf-8"> 
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <script src="Assets/js/jquery-1.10.2.min.js"></script>
@@ -41,14 +41,31 @@
     <script src="Assets/js/admin_style.js"></script>
     <script src="Assets/bootstrap/js/jquery.min.js"></script>
     <script src="Assets/bootstrap/js/bootstrap.js"></script> 
+    <script type="text/javascript">
+      function letter(e) 
+        { 
+            var key; var keychar; 
+                if (window.event) 
+                    key = window.event.keyCode; 
+                else if (e)   
+                    key = e.which; 
+                else return true; 
+                keychar = String.fromCharCode(key); 
+                keychar = keychar.toLowerCase(); 
+                if ((("ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz ").indexOf(keychar) > -1)) 
+                    return true;
+                else 
+                    return false; 
+        }
+    </script>
   </head>
   <body>
-    <nav class="navbar navbar-default navbar-static-top" style="background-color: #7f0000;>
+    <nav class="navbar navbar-default navbar-static-top" style="background-color: #7f0000;">
       <div class="container-fluid">
         <!-- Brand and toggle get grouped for better mobile display -->
         <div class="navbar-header">
      
-       <img id="logo-img" style="height: 100px;width:100px;" class="logo-img" src="Assets/Images/ec.png"/>
+       <img id="logo-img" style="height: 100px;width:100px;" class="logo-img" src="Assets/Images/EC.png"/>
        <div style="margin-left: 100px;margin-top: -50px;">
        <H4 style="color:white;"> EC NEW DEAL GROCERY </H4>
        </div>
@@ -61,7 +78,7 @@
         <li class="dropdown">
           <a href="#" class="dropdown-toggle" style="color:white;" data-toggle="dropdown" role="button" aria-expanded="false">
         
-            Welcome, <?php echo $userlevel." ".$firstname." ".$lastname;?>
+            Welcome, <?php echo "{$firstname} {$lastname}";?>
             <span class="caret"></span></a>
             <ul class="dropdown-menu" role="menu">
               <li class="dropdown-header">SETTINGS</li>
@@ -87,14 +104,14 @@
               <div class="side-menu-container">
                 <ul class="nav navbar-nav">
                   <li><a href="dashboard.php"><span class="glyphicon glyphicon-dashboard"></span> Dashboard</a></li>
-                  <li><a href="user.php"><span class="fa fa-user"></span> User Management</a></li>
                   <li class="active"><a href="category.php"><span class="fa fa-tasks"></span> Category</a></li>
                   <li><a href="supplier.php"><span class="fa fa-truck"></span> Supplier</a></li>
                   <li><a href="products.php"><span class="fa fa-shopping-bag"></span> Items</a></li>
                   <li><a href="inventory.php"><span class="fa fa-pie-chart"></span> Inventory</a></li>
                   <li><a href="reports.php"><span class="fa fa-database"></span> Reports</a></li>
+                  <li><a href="orders.php"><span class="fa fa-list"></span> Orders</a></li>
+                  <li><a href="user.php"><span class="fa fa-user"></span> User Management</a></li>
 
-                  
                 </ul>
               </div><!-- /.navbar-collapse -->
             </nav>
@@ -111,15 +128,15 @@
             </div>
           <div class="panel-body">
             <?php 
-                    $display_cat=mysql_query("SELECT * FROM tbl_category") or die(mysql_error());
+                    $display_cat=mysqli_query($open_connection,"SELECT * FROM tbl_category") or die(mysqli_error($open_connection));
                     $i=1;
                     
-                    while($row=mysql_fetch_array($display_cat)){
+                    while($row=mysqli_fetch_array($display_cat)){
                       $Cat_ID=$row['Category_ID'];
                       $collap="collapse{$Cat_ID}";
                       $Cat_Name=$row['Category_Name'];
 
-                      $display_scat=mysql_query("SELECT * FROM tbl_subcategory WHERE Category_ID='{$Cat_ID}'") or die(mysql_error());          
+                      $display_scat=mysqli_query($open_connection,"SELECT * FROM tbl_subcategory WHERE Category_ID='{$Cat_ID}'") or die(mysqli_error($open_connection));          
             ?>
             <!--Categories with collapsable Sub Categories-->
             <div class="panel-group">
@@ -142,7 +159,7 @@
                 <div id=<?php echo "{$collap}"?> class="panel-collapse collapse">
                   <ul class="list-group">
                     <?php 
-                      while($row2=mysql_fetch_array($display_scat)){
+                      while($row2=mysqli_fetch_array($display_scat)){
                         $SCat_ID=$row2['SCat_ID'];
                         $SCat_Name=$row2['SubCategory_Name'];
                     ?>
@@ -154,7 +171,7 @@
                         <i class="fa fa-pencil"></i>
                         </a>
                         <input type="hidden" name="SCate_ID" value="<?php echo $SCat_ID; ?>">
-                        <button type="submit" name="deleteSCat" id="deleteSCat" class="btn btn-danger btn-sm" onClick="del_confirmation();return false;"> 
+                        <button type="submit" name="deleteSCat" id="deleteSCat" class="btn btn-danger btn-sm" onClick="del_confirmation2();return false;"> 
                           <span class="fa fa-trash"></span>
                         </button>
                         </div>
@@ -192,7 +209,7 @@
           Copyright &COPY; 2017 EC New Deal Grocery. All Rights Reserved.
       </p>
     </footer>
-    	
+      
   <!--Modals Below-->
     <!--=================================================[ ADD CATEGORY ]==================================================-->
     <div id="Cat" class="modal fade" role="dialog">
@@ -201,13 +218,13 @@
         <div class="modal-content">
           <div class="modal-header">
             <button type="button" class="close" data-dismiss="modal">&times;</button>
-            <h4 class="modal-title">Modal Header</h4>
+            <h4 class="modal-title">Add Category</h4>
           </div>
           <div class="modal-body">
             <form class="form-signin" method="post" action="category_CRUD.php">
               <div class="form-group">
                 <label for="exampleInputEmail1">Enter Category Name</label>
-                <input type="text" class="form-control" id="Category" name="Category" placeholder="Category Name" required>
+                <input type="text" class="form-control" id="Category" name="Category" placeholder="Category Name" onKeyPress="return letter(event)" required>
               </div>
 
               <a href="#" class="btn btn-success" id="filldetails" onclick="addFields()">Add Sub Category</a>
@@ -238,7 +255,7 @@
               <div class="form-group">
                 <label for="exampleInputEmail1">Enter SubCategory Name</label>
                 <input type="hidden" class="form-control" name="Sub" value="" />
-                <input type="text" class="form-control" id="SubCategory" name="SubCategory" placeholder="Sub Category Name" required>
+                <input type="text" class="form-control" id="SubCategory" name="SubCategory" placeholder="Sub Category Name" onKeyPress="return letter(event)" required>
               </div>
               <button type="submit" name="SubCategorySubmit" class="btn btn-default">Save</button>
             </form>
@@ -263,7 +280,7 @@
               <div class="form-group">
                 <label>Enter Category Name</label>
                 <input type="hidden" class="form-control" name="C_ID" value="" />
-                <input type="text" class="form-control" id="Ctgry" name="Ctgry" placeholder="Category Name" >
+                <input type="text" class="form-control" id="Ctgry" name="Ctgry" placeholder="Category Name" onKeyPress="return letter(event)" >
               </div>
               <button type="submit" name="EditCategorySubmit" class="btn btn-default">Save Changes</button>
             </form>
@@ -287,7 +304,7 @@
             <form class="form-signin" method="post" action="category_CRUD.php">
               <div class="form-group">
                 <label>Enter Category Name</label>
-                <input type="hidden" class="form-control" name="SC_ID" value="" />
+                <input type="hidden" class="form-control" name="SC_ID" onKeyPress="return letter(event)" />
                 <input type="text" class="form-control" id="SCtgry" name="SCtgry" placeholder="Category Name">
               </div>
               <button type="submit" name="EditSCategorySubmit" class="btn btn-default">Save Changes</button>
@@ -299,77 +316,81 @@
         </div>
       </div>
     </div>
-       <!-- USER ACCOUNT SETTINGS-->
-                  <?php include 'connection.php' ?>
-                  <div  class="modal fade" id="accountSettings" tabindex="-1" role="dialog" >
-                    <div class="modal-dialog">
-                      <div class="modal-content modal-sm" style="margin-left:150px;">
-                        <div class="modal-header"> <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-                          <h4 class="modal-title">Account Settings</h4>
-                        </div>
-                        <div class="modal-body" >
-                            <form method="post">
-                              <div class="row">
-                                <div class="col-sm-12">
-                                  <div class="input-group">
-                                    <div>
-                                        <label class="form-label">
-                                        Username
-                                        </label> 
-                                    </div>
-                                    <input type="hidden" name="ids" value="<?php echo $ids?>" class="form-control" style="margin-bottom:10px;">
-                                    <input type="text" name="username" value="<?php echo $usernames; ?>" class="form-control" style="margin-bottom: 10px;">
-                                      <label class="form-label">
-                                        Old Password
-                                      </label>
-                                      <input type="hidden" name="passwords" value="<?php echo $passwords; ?>">
-                                      <input type="text"  name="old_password" id="old_password" placeholder="Enter Old Password" class="form-control" aria-describedby="basic-addon1" >
-                                      <hr/>
-                                      <label>
-                                        New Password
-                                      </label>
-                                      <input type="password"  name="new_password" id="new_password" placeholder="Enter New Passoword" class="form-control" aria-describedby="basic-addon1" style="margin-bottom: 10px;">
-                                    <input type="password"  name="confirm_password" id="confirm_password" placeholder="Confirm Password" class="form-control" aria-describedby="basic-addon1" style="margin-bottom: 10px;">
-                                  </div>
-                                </div> 
-                                <div style="text-align: center;"><input type="submit" class="btn btn-success" name="btn_save_new_password">
-                                </div>
-                              </div>
-                            </form>
-                            </div>
-                            </div>
-                            </div>
-
-                            
-                            <?php 
-                               if(isset($_POST['btn_save_new_password']))
-                                {
-                                 $username = $_POST['username'];
-                                 $passwords = $_POST['passwords'];
-                                 $old_password = $_POST['old_password'];
-                                 $new_password = $_POST['new_password'];
-                                 $confirm_password = $_POST['confirm_password'];
-
-                                 if($passwords == $old_password)
-                                 {
-                                  if($new_password == $confirm_password)
-                                  {
-                                   
-                                   $query1= mysql_query("UPDATE tbl_users SET username='$username', password='$new_password' WHERE id='$ids'") or die (mysql_error());
-
-                                    echo "<script type='text/javascript'>alert('SUCCESS!');</script>";
-                                  }
-                                  else
-                                  {
-                                    echo "<script type='text/javascript'>alert('NEW PASSWORD AND CONFIRM PASSWORD NOT THE SAME!');</script>";
-                                  }
-                                 }
-                                  else
-                                  {
-                                    echo "<script type='text/javascript'>alert('incorrect old password!');</script>";
-                                  }
-                                }
-                            ?>
+    <!-- ============================================================[ USER ACCOUNT SETTINGS ]==========================================================-->
+    <div  class="modal fade" id="accountSettings" tabindex="-1" role="dialog" >
+      <div class="modal-dialog">
+        <div class="modal-content modal-sm" style="margin-left:150px;">
+          <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+            <h4 class="modal-title">Account Settings</h4>
+          </div>
+          <div class="modal-body" >
+            <form method="post">
+              <div class="row">
+                <div class="col-sm-12">
+                  <div class="input-group">
+                    <div>
+                      <label class="form-label">Username</label> 
+                    </div>
+                    <input type="hidden" name="ids" value="<?php echo $ids?>" class="form-control" style="margin-bottom:10px;">
+                    <input type="text" name="username" value="<?php echo $usernames; ?>" class="form-control" style="margin-bottom: 10px;">
+                    <label class="form-label">Old Password</label>
+                    <input type="hidden" name="passwords" value="<?php echo $passwords; ?>">
+                    <input type="password"  name="old_password" id="old_password" placeholder="Enter Old Password" class="form-control" aria-describedby="basic-addon1" >
+                    <hr/>
+                    <label>New Password</label>
+                    <input type="password"  name="new_password" id="new_password" placeholder="Enter New Passoword" class="form-control" aria-describedby="basic-addon1" style="margin-bottom: 10px;">
+                    <input type="password"  name="confirm_password" id="confirm_password" placeholder="Confirm Password" class="form-control" aria-describedby="basic-addon1" style="margin-bottom: 10px;">
+                  </div>
+                </div> 
+                <div style="text-align: center;"><input type="submit" class="btn btn-success" name="btn_save_new_password"></div>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+    <?php 
+      if(isset($_POST['btn_save_new_password'])){
+        $username = $_POST['username'];
+        $passwords = $_POST['passwords'];
+        $old_password = $_POST['old_password'];
+        $new_password = $_POST['new_password'];
+        $confirm_password = $_POST['confirm_password'];
+        $UC = false;
+        $LC = false;
+        $NUM = false;
+        if($passwords == $old_password){
+          if($new_password == $confirm_password){
+            for ($i=0; $i < strlen($new_password); ++$i) { 
+              $b=$new_password[$i];
+              if (ctype_upper($b)) {
+                $UC = true;
+              }
+              elseif (ctype_lower($b)) {
+                $LC = true;
+              }
+              elseif (ctype_digit($b)) {
+                $NUM = true;
+              }
+            }
+            if (strlen($confirm_password) < 8) {
+              echo "<script type='text/javascript'> alert ('Password must be at least 8 character long!'); </script>";
+            }
+            elseif ($UC && $LC && $NUM ) {
+              $pass = md5($new_password);
+              $query1= mysqli_query($open_connection,"UPDATE tbl_users SET username='$username', password='$pass' WHERE id='$ids'") or die (mysqli_error($open_connection));
+              echo "<script type='text/javascript'>alert('Password Successfully Change!');</script>";
+            }
+            else {
+              echo "<script type='text/javascript'> alert ('Password must have at least an uppercase letter, a lowercase letter and a number! '); </script>";
+            }
+          }
+          else{echo "<script type='text/javascript'>alert('NEW PASSWORD AND CONFIRM PASSWORD NOT THE SAME!');</script>";}
+        }
+        else{echo "<script type='text/javascript'>alert('incorrect old password!');</script>";}
+      }
+    ?>
                    
     <!--=====================================[ SCRIPTS ]==========================================-->
     <script>
@@ -399,7 +420,15 @@
 
       function del_confirmation()
       {
-        if(confirm("Are you sure?")==1)
+        if(confirm("Are you sure you want to delete this Category?")==1)
+        {
+          document.getElementById('deleteUser').submit();
+        }
+      }
+
+      function del_confirmation2()
+      {
+        if(confirm("Are you sure you want to delete this Sub Category?")==1)
         {
           document.getElementById('deleteUser').submit();
         }
@@ -416,11 +445,14 @@
         input.type = "text";
         input.className = "form-control input-sm";
         input.name = "SC" + i;
+        input.onkeypress = function(event){return letter(event)}
         container.appendChild(input);
         container.appendChild(document.createElement("br"));
         i++;
             
       }
+
+      
     </script>
 
   </body>

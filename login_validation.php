@@ -5,18 +5,18 @@ include'connection.php';
 
 $username=$_POST['username'];
 $password=$_POST['password'];
+$pass = md5($password);
 
-
-$query1="SELECT * from tbl_users WHERE username='$username' AND password='$password'";
-$result1=mysql_query($query1);
-$record=mysql_num_rows($result1);
+$query1="SELECT * from tbl_users WHERE username='$username' AND password='$pass'";
+$result1=mysqli_query($open_connection,$query1);
+$record=mysqli_num_rows($result1);
 
 
 if($record==1){
 	$query2="SELECT * from tbl_users WHERE username='$username' AND password='$password'";
-	$result2=mysql_query($query1);
+	$result2=mysqli_query($open_connection,$query1);
 
-	while(list($id,$firstname,$lastname,$username,$password,$userlevel)=mysql_fetch_array($result2))
+	while(list($id,$firstname,$lastname,$username,$password,$userlevel,$image)=mysqli_fetch_array($result2))
 	{
 		$aid=$id;
 		$afirstname=$firstname;
@@ -24,6 +24,7 @@ if($record==1){
 		$ausername=$username;
 		$apassword=$password;
 		$auserlevel=$userlevel;
+		$img_user=$image;
 
 	}
 		session_start();
@@ -33,12 +34,13 @@ if($record==1){
 		$_SESSION['username']=$ausername;
 		$_SESSION['password']=$apassword;
 		$_SESSION['userlevel']=$auserlevel;
+		$_SESSION['image']=$img_user;
 		$_SESSION['id'];
 
 		if($auserlevel=='Super Admin'){
 		echo"
 			<script type='text/javascript'>
-				alert('Successfully login!')
+				alert('Successfully logged in!')
 				open('dashboard.php','_self');
 			</script>
 		";	
@@ -58,6 +60,13 @@ if($record==1){
 		";	
 		}
 		else if($auserlevel=='Merchandiser'){
+		echo"
+			<script type='text/javascript'>
+				open('merchandiser.php','_self');
+			</script>
+		";	
+		}
+		else if($auserlevel=='Courier'){
 		echo"
 			<script type='text/javascript'>
 				open('merchandiser.php','_self');

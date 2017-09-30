@@ -1,6 +1,7 @@
 <?php 
   include 'connection.php';
   session_start();
+  error_reporting(E_ERROR | E_WARNING | E_PARSE);
   if($_SESSION['id']){
             $ids=$_SESSION['id'];
             $firstname=$_SESSION['firstname'];
@@ -22,12 +23,14 @@
       $supp=$_POST['supp'];
       $sp=$_POST['StandardPrice'];
       $lp=$_POST['ListPrice'];
+
       $quantity=$_POST['quantity'];
       $disc = 0;
       $storedFile="images/products/".basename($_FILES["file"]["name"]);
       move_uploaded_file($_FILES["file"]["tmp_name"], $storedFile);
       mysqli_query($open_connection,"INSERT into tbl_products(`barcode`, `product_name`, `Category_ID`, `SCat_ID`, `supplier_ID`, `standard_price`, `list_price`, `discontinue`, `image`,`quantity`)VALUES('$bc','$pName','$cat','$scat','$supp',$sp,$lp,$disc,'$storedFile','$quantity')") or die(mysqli_error($open_connection));
       $id=mysqli_insert_id('$id');
+
       mysqli_query($open_connection,"INSERT into tbl_inventory(product_ID) VALUES($id)") or die(mysqli_error($open_connection));  
     }
   //=========================================================[ EDIT PRODUCT ]============================================================
@@ -47,17 +50,24 @@
       }
       else{
         $disc = 0;
+
       }
       $storedFile="images/products/".basename($_FILES["file"]["name"]);
-      move_uploaded_file($_FILES["file"]["tmp_name"], $storedFile);
-      echo "UPDATE tbl_products SET `barcode`='$bc',`product_name`='$pName',`Category_ID`=$cat,`supplier_ID`=$supp,`standard_price`=$sp,`list_price`=$lp,`discontinue`=$disc,`image`=$storedFile WHERE product_ID=$pID";
-      mysqli_query($open_connection,"UPDATE tbl_products SET `barcode`='$bc',`product_name`='$pName',`Category_ID`=$cat,`supplier_ID`=$supp,`standard_price`=$sp,`list_price`=$lp,`discontinue`=$disc,`image`='$storedFile' WHERE product_ID=$pID"); 
+      if ($storedFile == "images/products/") {
+        mysqli_query($open_connection,"UPDATE tbl_products SET `barcode`='$bc',`product_name`='$pName',`Category_ID`=$cat,`supplier_ID`=$supp,`standard_price`=$sp,`list_price`=$lp,`discontinue`=$disc WHERE product_ID=$pID"); 
+      }
+      else{
+        move_uploaded_file($_FILES["file"]["tmp_name"], $storedFile);
+        mysqli_query($open_connection,"UPDATE tbl_products SET `barcode`='$bc',`product_name`='$pName',`Category_ID`=$cat,`supplier_ID`=$supp,`standard_price`=$sp,`list_price`=$lp,`discontinue`=$disc,`image`='$storedFile' WHERE product_ID=$pID"); 
+      }
     }
 ?>
 <!DOCTYPE html>
 <html>
  <head>
+
     <title>Product</title>
+
     <meta charset="utf-8"> 
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <script src="Assets/js/jquery-1.10.2.min.js"></script>
@@ -80,15 +90,22 @@
     <script type="text/javascript" src="DataTables/js/dataTables.bootstrap.min.js"></script>  
     <script type="text/javascript">
 
-  
-    $(document).ready(function(){
-        $('#myTable').DataTable();});
+
+    $(document).ready( function() {
+      $('#myTable').DataTable({
+        "aoColumnDefs" : [ {
+        "bSortable" : false,
+        "aTargets" : [ "no-sort" ]}]
+        
+      });
+    });
+
     </script>
 
     <script type="text/javascript">
       function showCat(str) {
           if (str == "") {
-              document.getElementById("txtHint").innerHTML = "AAAAAAAAAAAsho";
+
               return;
           } else { 
               if (window.XMLHttpRequest) {
@@ -103,7 +120,29 @@
                       document.getElementById("txtHint").innerHTML = this.responseText;
                   }
               };
-              xmlhttp.open("GET","getcategory.php?q="+str,true);
+              xmlhttp.open("GET","getcategory1.php?q="+str,true);
+              xmlhttp.send();
+          }
+      }
+
+      function showUser2(str) {
+          if (str == "") {
+              document.getElementById("txtHint2").innerHTML = "";
+              return;
+          } else { 
+              if (window.XMLHttpRequest) {
+                  // code for IE7+, Firefox, Chrome, Opera, Safari
+                  xmlhttp = new XMLHttpRequest();
+              } else {
+                  // code for IE6, IE5
+                  xmlhttp = new ActiveXObject("Microsoft.XMLHTTP");
+              }
+              xmlhttp.onreadystatechange = function() {
+                  if (this.readyState == 4 && this.status == 200) {
+                      document.getElementById("txtHint2").innerHTML = this.responseText;
+                  }
+              };
+              xmlhttp.open("GET","getcategory2.php?q="+str,true);
               xmlhttp.send();
           }
       }
@@ -179,7 +218,6 @@
                 else 
                     return false; 
         }
-      
                     
                 $("StandardPrice").keypress(function(event) {
                     if(event.which == 8 || event.which == 0){
@@ -197,6 +235,7 @@
         //event.preventDefault();
     } // prevent if already dot
 });
+
         function lenum(e) 
         { 
             var key; var keychar; 
@@ -239,6 +278,7 @@
   
 
   <body>
+
     <nav class="navbar navbar-default navbar-static-top" style="background-color: #7f0000;>
       <div class="container-fluid">
         <!-- Brand and toggle get grouped for better mobile display -->
@@ -258,7 +298,6 @@
               Welcome, <?php echo "{$firstname} {$lastname}";?>
               <span class="caret"></span></a>
               <ul class="dropdown-menu" role="menu">
-               
                 <li><a href="#" data-toggle="modal" data-target="#accountSettings"><i class="fa fa-user fa-fw"></i>Profile</li>
                
                 <li class="divider"></li>
@@ -279,7 +318,7 @@
             <nav class="navbar navbar-default" role="navigation">
               <!-- Main Menu -->
               <div class="side-menu-container">
-                <ul class="nav navbar-nav">
+                <ul class="nav navbar-nav" >
                   <li ><a href="dashboard.php"><span class="glyphicon glyphicon-dashboard"></span> Dashboard</a></li>
                   <li><a href="category.php"><span class="fa fa-tasks"></span> Category</a></li>
                   <li><a href="supplier.php"><span class="fa fa-truck"></span> Supplier</a></li>
@@ -317,21 +356,26 @@
                     <th>Standard Price</th>
                     <th>List Price</th>
                     <th>Status</th>
-                    <th>View</th>
-                    <th>Edit</th>
+                    <th class="no-sort">Actions</th>
+                    
                   </tr>
                 </thead>
                 <tr>
                 <?php 
-                          $sql_display="SELECT product_ID,barcode,product_name,Category_Name,SubCategory_Name,supplier_name,standard_price,list_price,discontinue,image FROM `tbl_products` INNER JOIN tbl_category USING(`Category_ID`) INNER JOIN tbl_subcategory USING (`SCat_ID`) Inner JOIN tbl_supplier USING (`supplier_ID`)";
+
+                       $sql_display="SELECT product_ID,barcode,product_name,p.Category_ID,Category_Name,p.SCat_ID,SubCategory_Name,s.supplier_ID,supplier_name,standard_price,list_price,discontinue,image FROM tbl_products p INNER JOIN tbl_category USING(`Category_ID`) INNER JOIN tbl_subcategory USING (`SCat_ID`) Inner JOIN tbl_supplier s USING (`supplier_ID`) ORDER BY product_ID ASC";
+
                           $display_users=mysqli_query($open_connection,$sql_display) or die(mysqli_error($open_connection));
                             
                             while($row=mysqli_fetch_array($display_users)){
                               $id = $row['product_ID'];
                               $bc=$row['barcode'];
                               $pn=$row['product_name'];
+                              $cid=$row['Category_ID'];
                               $cn=$row['Category_Name'];
+                              $sid=$row['SCat_ID'];
                               $scn=$row['SubCategory_Name'];
+                              $suid=$row['supplier_ID'];
                               $sn=$row['supplier_name'];
                               $sp=$row['standard_price'];
                               $lp=$row['list_price'];
@@ -347,107 +391,22 @@
                   <td><?php echo $sp; ?></td>
                   <td><?php echo $lp; ?></td>
                   <td><?php if ($disc == 0) {echo "Available";}else{echo "Discontinued";}  ?></td>
+                  <?php //$test = json_encode(array("a"=>$id,"b"=>$bc,"c"=>$pn,"d"=>$cn,"e"=>$scn,"f"=>$sp,"g"=>$lp,"h"=>$disc,"i"=>$img_display)); ?>
+                  <?php $test = '['.$id.',"'.$bc.'","'.$pn.'",'.$cid.','.$sid.','.$suid.','.$disc.','.$sp.','.$lp.',"'.$img_display.'"]'; ?>
                   <td>
-                    <a data-target="#viewModal<?php echo $id; ?>" class="btn btn-success btn-sm" title="Edit Menu" data-toggle="modal" ><i class="fa fa-eye"></i></a>
-                  </td>
-                  <td>
-                    <a data-target="#editModal<?php echo $id; ?>" class="btn btn-success btn-sm" title="Edit Menu" data-toggle="modal" ><i class="fa fa-pencil"></i></a>
+                    <div class="col-md-12" style="padding:0px;">
+                      <div class="col-md-6">
+                        <a data-target="#viewModal<?php echo $id; ?>" class="btn btn-success btn-sm" title="Edit Menu" data-toggle="modal" ><i class="fa fa-eye"></i></a>
+                      </div>
+                      <div class="col-md-6">
+                        <a href="editproduct.php?product_ID=<?php echo $id; ?>" class="btn btn-success btn-sm"><i class="fa fa-pencil"></i></a>
+                      </div>  
+                    </div>
+                   
                   </td>
                 </tr>
-
-                <div id="editModal<?php echo $id; ?>" class="modal fade" role="dialog">
-                 <div class="modal-dialog">
-                  <!-- Modal content-->
-                  <div class="modal-content">
-                    <div class="modal-header">
-                      <button type="button" class="close" data-dismiss="modal">&times;</button>
-                      <h4 class="modal-title">Edit Product Information</h4>
-                    </div>
-                    <div class="modal-body">
-                      <form class="form-signin" method="post" enctype="multipart/form-data">
-                        <div class="form-group">
-                          <div class="row">
-                            <input type="hidden" name="productID" value="<?php echo $id?>">
-                            <div class="col-md-6">
-                              <div class="col-md-12">
-                                <label>Barcode</label>
-                                <input type="text" class="form-control" id="barcode" name="barcode" placeholder="Barcode" onmouseover="this.focus();" tabindex="1" onKeyPress="return number(event)" value="<?php echo $bc; ?>">  
-                              </div>
-                              <div class="col-md-12">
-                              <label>Product Name</label>   
-                              <input type="text" class="form-control" id="ProductName" name="ProductName" placeholder="Product Name" tabindex="3" value="<?php echo $pn; ?>">
-                            </div>
-                               
-                            </div>
-                            
-                            
-                            <div class="col-md-6">
-                                <div class="input-group">
-                                  <img src="<?php echo $img_display; ?>" style="width:100px;height:100px">
-                                  <input type="file" name="file">
-                                </div>            
-                              </div> 
-                            <div class="col-md-12">
-                              <label>Category</label>
-                              <select class="form-control" name="select_cat" id="select_cat" tabindex="4" onclick="showCat(this.value)" required >
-                                <option value="" disabled selected>Select Category</option>
-                                  <?php 
-                                    $display_cat=mysqli_query($open_connection,"SELECT * FROM tbl_category") or die(mysqli_error($open_connection));
-                                    $i=1;
-                                    while($row=mysqli_fetch_array($display_cat)){
-                                      $Cat_ID=$row['Category_ID'];
-                                      $Cat_Name=$row['Category_Name'];
-                                  ?>
-                                <option value="<?php echo $Cat_ID; ?>"><?php echo $Cat_Name; ?></option>
-                                <?php } ?>        
-                              </select>     
-                            </div>
-                            <div class="col-md-12">
-                              <div id="txtHint"></div>       
-                            </div>
-                            <div class="col-md-12">
-                              <label>Supplier</label>
-                              <select class="form-control" id="supp" name="supp" tabindex="6">
-                                <option value="" disabled selected>Select Supplier</option>
-                                  <?php 
-                                    $display_supplier=mysqli_query($open_connection,"SELECT * FROM tbl_supplier") or die(mysqli_error($open_connection));
-                                    $i=1;
-                                    while($row=mysqli_fetch_array($display_supplier)){
-                                      $Supplier_ID=$row['supplier_ID'];
-                                      $Supp_Name=$row['supplier_name'];
-                                  ?>
-                                <option value="<?php echo $Supplier_ID; ?>"><?php echo $Supp_Name; ?></option>
-                                  <?php } ?> 
-                              </select>       
-                            </div>
-                            <div class="col-md-12">
-                              <label>Discontinued</label>
-                              <input type="checkbox" name="check_dis" id="check_dis" value="YES" <?php if ($disc == 1) { echo "checked";} ?> >
-                            </div>
-                            <div class="col-md-12">
-                              <div class="form-group">
-                                <label>Standard Price</label>
-                                <input type="text" class="form-control" id="StandardPrice" name="StandardPrice" placeholder="Standard Price" tabindex="7" onKeyPress="return number2(event)" value="<?php echo $sp; ?>">
-                                <label >List Price</label>
-                                <input type="number" class="form-control" id="ListPrice" name="ListPrice" placeholder="List Price" tabindex="8" onKeyPress="return number3(event)" value="<?php echo $lp; ?>">
-                              </div>         
-                            </div>  
-                            <div class="col-md-2">
-                              
-                            </div>
-                          </div>
-                        </div>  
-                      </form>
-                    </div>
-                    <div class="modal-footer">
-                    <button type="submit" name="ProductEdit" class="btn btn-success" tabindex="9">Submit</button>
-                      <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-                    </div>
-                  </div>
-                </div> 
-              </div>
-
-                             <div id="viewModal<?php echo $id; ?>" class="modal fade" role="dialog">
+    
+              <div id="viewModal<?php echo $id; ?>" class="modal fade" role="dialog">
                  <div class="modal-dialog">
                   <!-- Modal content-->
                   <div class="modal-content">
@@ -556,11 +515,13 @@
                       <label for="Category">Barcode (Optional)</label>
                       <input type="text" class="form-control" id="barcode" name="barcode" placeholder="Barcode" onmouseover="this.focus();" tabindex="1" onKeyPress="return number(event)">  
                     </div>  
+
                     </div>
 
                     <div class="col-md-6">
                       <label>Product Image</label>
                       <input type="file" name="file" id="image" class="form-control" placeholder="Image" required>
+
                     </div>
 
                     </div>
@@ -576,6 +537,7 @@
                      <div class="col-md-6" style="margin-bottom: 20px;"> 
                  <div class="input-group">
                  <span class="input-group-addon" id="basic-addon1">Category</span>
+
                     <select class="form-control" name="select_cat" id="select_cat" tabindex="4" onchange="showUser2(this.value)">
                       <option value="" disabled selected>Select Category</option>
                         <?php 
@@ -589,6 +551,7 @@
                       <?php } ?>        
                     </select>     
                   </div>
+
                  </div>
                  </div>
                  <div class="row">
@@ -596,6 +559,7 @@
                 <div class="col-md-6"> 
                  <div class="input-group">
                  <span class="input-group-addon" id="basic-addon1">Supplier Name</span>
+
                     <select class="form-control" id="supp" name="supp" tabindex="6">
                       <option value="" disabled selected>Select Supplier</option>
                         <?php 
@@ -617,6 +581,7 @@
                   onKeyPress="return number2(event)"  maxlenght="50" placeholder="Quantity Per Unit" required="">
                     </div>
                   </div>
+
                  </div>
                   <div class="row">
                     <div class="col-md-6"> 
@@ -645,6 +610,7 @@
           </div>
         </div>
       </div> 
+
     </div>
     <!-- ============================================================[ USER ACCOUNT SETTINGS ]==========================================================-->
     <div  class="modal fade" id="accountSettings" tabindex="-1" role="dialog" >
@@ -722,7 +688,7 @@
       }
     ?>
          <!-- =================================[ SCRIPTS ]=========================-->   
-         <script type="text/javascript">
+        <script type="text/javascript">
            $('input,select').on('keypress', function (e) {
               if (e.which == 13) {
                   e.preventDefault();
@@ -734,7 +700,6 @@
                   $next.focus();
               }
           });
-
 
           $('#StandardPrice').keypress(function(event) {
     if (((event.which != 46 || (event.which == 46 && $(this).val() == '')) ||
