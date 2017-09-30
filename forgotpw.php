@@ -32,7 +32,7 @@
     /*$message=   
             'Username: '.$username.'<br> 
             Password: '.$password;*/
-    $message='Dear '.$fname.' '.$lname.',<br> A request has been sent to reset your password. Please the following link to reset your password';
+    $message='Dear '.$fname.' '.$lname.',<br> A request has been sent to reset your password. Please click the following link to reset your password.<br>www.tumblr.com';
     require "phpmailer/class.phpmailer.php"; //include phpmailer class
       
     // Instantiate Class  

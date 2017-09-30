@@ -13,23 +13,6 @@
   else{
           header("location:dashboard.php");
       } 
-  //=========================================================[ ADD PRODUCT ]============================================================
-  if(isset($_POST['ProductSubmit']))
-    {
-      $bc=$_POST['barcode'];    
-      $pName=$_POST['ProductName'];
-      $cat=$_POST['select_cat'];
-      $scat=$_POST['radio_sc2'];
-      $supp=$_POST['supp'];
-      $sp=$_POST['StandardPrice'];
-      $lp=$_POST['ListPrice'];
-      $disc = 0;
-      $storedFile="images/products/".basename($_FILES["file"]["name"]);
-      move_uploaded_file($_FILES["file"]["tmp_name"], $storedFile);
-      mysqli_query($open_connection,"INSERT into tbl_products(`barcode`, `product_name`, `Category_ID`, `SCat_ID`, `supplier_ID`, `standard_price`, `list_price`, `discontinue`, `image`)VALUES('$bc','$pName','$cat','$scat','$supp',$sp,$lp,$disc,'$storedFile')") or die(mysqli_error($open_connection));
-      $id=mysqli_insert_id($open_connection);
-      mysqli_query($open_connection,"INSERT into tbl_inventory(product_ID) VALUES($id)") or die(mysqli_error($open_connection));  
-    }
   //=========================================================[ EDIT PRODUCT ]============================================================
   if(isset($_POST['ProductEdit']))
     {
@@ -57,9 +40,11 @@
         move_uploaded_file($_FILES["file"]["tmp_name"], $storedFile);
         mysqli_query($open_connection,"UPDATE tbl_products SET `barcode`='$bc',`product_name`='$pName',`Category_ID`=$cat,`supplier_ID`=$supp,`standard_price`=$sp,`list_price`=$lp,`discontinue`=$disc,`image`='$storedFile' WHERE product_ID=$pID"); 
       }
+      header("location:products.php");
       
     }
-?>
+
+  ?>
 <!DOCTYPE html>
 <html>
  <head>
@@ -304,131 +289,122 @@
               <span class="fa fa-shopping-bag"></span>Products
             </div>
             <div class="panel-body">
-              <form method="POST">
-                    
-              </form>
-              <table class="table table-striped" style="font-size:14px;" id="myTable"> 
-                <thead>
-                  <tr>
-                    <th>Barcode</th>
-                    <th>Product Name</th>
-                    <th>Category</th>
-                    <th>Sub Category</th>
-                    <th>Supplier</th>
-                    <th>Standard Price</th>
-                    <th>List Price</th>
-                    <th>Status</th>
-                    <th class="no-sort">Actions</th>
-                    
-                  </tr>
-                </thead>
-                <tr>
-                <?php 
-                          $sql_display="SELECT product_ID,barcode,product_name,p.Category_ID,Category_Name,p.SCat_ID,SubCategory_Name,s.supplier_ID,supplier_name,standard_price,list_price,discontinue,image FROM tbl_products p INNER JOIN tbl_category USING(`Category_ID`) INNER JOIN tbl_subcategory USING (`SCat_ID`) Inner JOIN tbl_supplier s USING (`supplier_ID`) ORDER BY product_ID ASC";
-                          
-                          $display_users=mysqli_query($open_connection,$sql_display) or die(mysqli_error($open_connection));
-                            
-                            while($row=mysqli_fetch_array($display_users)){
-                              $id = $row['product_ID'];
-                              $bc=$row['barcode'];
-                              $pn=$row['product_name'];
-                              $cid=$row['Category_ID'];
-                              $cn=$row['Category_Name'];
-                              $sid=$row['SCat_ID'];
-                              $scn=$row['SubCategory_Name'];
-                              $suid=$row['supplier_ID'];
-                              $sn=$row['supplier_name'];
-                              $sp=$row['standard_price'];
-                              $lp=$row['list_price'];
-                              $disc=$row['discontinue'];
-                              $img_display = $row['image'];                        
-                        ?>
-                
-                  <td><?php echo $bc; ?></td>
-                  <td><?php echo $pn; ?></td>
-                  <td><?php echo $cn; ?></td>
-                  <td><?php echo $scn; ?></td>
-                  <td><?php echo $sn; ?></td>
-                  <td><?php echo $sp; ?></td>
-                  <td><?php echo $lp; ?></td>
-                  <td><?php if ($disc == 0) {echo "Available";}else{echo "Discontinued";}  ?></td>
-                  <?php //$test = json_encode(array("a"=>$id,"b"=>$bc,"c"=>$pn,"d"=>$cn,"e"=>$scn,"f"=>$sp,"g"=>$lp,"h"=>$disc,"i"=>$img_display)); ?>
-                  <?php $test = '['.$id.',"'.$bc.'","'.$pn.'",'.$cid.','.$sid.','.$suid.','.$disc.','.$sp.','.$lp.',"'.$img_display.'"]'; ?>
-                  <td>
-                    <div class="col-md-12" style="padding:0px;">
-                      <div class="col-md-6">
-                        <a data-target="#viewModal<?php echo $id; ?>" class="btn btn-success btn-sm" title="Edit Menu" data-toggle="modal" ><i class="fa fa-eye"></i></a>
-                      </div>
-                      <div class="col-md-6">
-                        <a href="editproduct.php?product_ID=<?php echo $id; ?>" class="btn btn-success btn-sm"><i class="fa fa-pencil"></i></a>
-                      </div>  
-                    </div>
-                   
-                  </td>
-                </tr>
-                
-              <div id="viewModal<?php echo $id; ?>" class="modal fade" role="dialog">
-                 <div class="modal-dialog">
-                  <!-- Modal content-->
-                  <div class="modal-content">
-                    <div class="modal-header">
-                      <button type="button" class="close" data-dismiss="modal">&times;</button>
-                      <h4 class="modal-title">View Product Information</h4>
-                    </div>
-                    <div class="modal-body">
-                      <form class="form-signin" method="post" enctype="multipart/form-data">
+              <?php 
+                if (isset($_GET['product_ID'])) {
+                  $id=$_GET['product_ID'];
+                  $sql="SELECT * FROM tbl_products WHERE product_ID=$id";
+                  $b=mysqli_query($open_connection,$sql);
+                  while($row1=mysqli_fetch_array($b)){
+                    $bc=$row1['barcode'];
+                    $pn=$row1['product_name'];
+                    $cid=$row1['Category_ID'];
+                    $cn=$row1['Category_Name'];
+                    $sid=$row1['SCat_ID'];
+                    $scn=$row1['SubCategory_Name'];
+                    $suid=$row1['supplier_ID'];
+                    $sn=$row1['supplier_name'];
+                    $sp=$row1['standard_price'];
+                    $lp=$row1['list_price'];
+                    $disc=$row1['discontinue'];
+                    $img_display = $row1['image'];  
+                  }
+                }
+              ?>
+              <form class="form-signin" method="post" enctype="multipart/form-data">
                         <div class="form-group">
                           <div class="row">
+                            <input type="hidden" name="productID">
                             <div class="col-md-6">
-                              <label>Barcode</label>
-                              <input type="text" class="form-control" id="barcode" name="barcode" placeholder="Barcode" tabindex="1" onKeyPress="return number(event)" value="<?php echo $bc; ?>" style="background-color:white;" readonly>  
+                              
+                                <label>Barcode</label>
+                                <input type="text" class="form-control" id="barcode" name="barcode" placeholder="Barcode" onmouseover="this.focus();" tabindex="1" onKeyPress="return number(event)" value="<?php echo $bc; ?>">  
+                              
                               <label>Product Name</label>   
-                              <input type="text" class="form-control" id="ProductName" name="ProductName" placeholder="Product Name" tabindex="3" value="<?php echo $pn; ?>" style="background-color:white;" readonly>
+                              <input type="text" class="form-control" id="ProductName" name="ProductName" placeholder="Product Name" tabindex="3" value="<?php echo $pn; ?>">
+                                
+                          </div>
+                            
+                            
+                            <div class="col-md-6">
+                                <div class="input-group">
+                                  <img src="<?php echo $img_display;?>" name="img_display" id="img_display"  style="width:100px;height:100px">
+                                  <input type="file" name="file">
+                                </div>            
+                              </div> 
+                            <div class="col-md-6">
+                              <label>Catergory</label>
+                              <select class="form-control" name="select_cat" id="select_cat" tabindex="4" onchange="showCat(this.value)" >
+                                <option value="null" disabled selected>Select Category</option>
+                                  <?php 
+                                    $display_cat=mysqli_query($open_connection,"SELECT * FROM tbl_category") or die(mysqli_error($open_connection));
+                                    $i=1;
+                                    while($row=mysqli_fetch_array($display_cat)){
+                                      $Cat_ID=$row['Category_ID'];
+                                      $Cat_Name=$row['Category_Name'];
+                                  ?>
+                                <option value="<?php echo $Cat_ID; ?>" <?php if ($Cat_ID==$cid) { echo "selected";}?> ><?php echo $Cat_Name; ?></option>
+                                <?php } ?>        
+                              </select>     
+                            </div>
+                            <div class="col-md-12">
+                              <div id="txtHint">
+                                <?php 
+                                $sql="SELECT * FROM tbl_subcategory WHERE Category_ID = ".$cid."";
+                                $result = mysqli_query($open_connection,$sql);
+
+                                while($row = mysqli_fetch_array($result)) {
+                                    if ($row['SCat_ID']==$sid) {
+                                      echo "<input type='radio' name='radio_sc' value='{$row['SCat_ID']}' tabindex='5' checked>" . $row['SubCategory_Name'] . "</a><br>";
+                                    }
+                                    else
+                                      echo "<input type='radio' name='radio_sc' value='{$row['SCat_ID']}' tabindex='5' >" . $row['SubCategory_Name'] . "</a><br>";
+                                    
+                                }
+                              ?>
+
+                              </div>       
                             </div>
                             <div class="col-md-6">
-                              <div class="input-group">
-                                <img src="<?php echo $img_display; ?>" style="width:100px;height:100px">
-                                
-                              </div>            
-                            </div>
-                            <div class="col-md-12">
-                              <label>Catergory</label>
-                              <input type="text" class="form-control" name="c_name" value="<?php echo $cn; ?>" style="background-color:white;" readonly>    
-                            </div>
-                            <div class="col-md-12">
-                              <label>Sub Catergory</label>
-                              <input type="text" class="form-control" name="sc_name" value="<?php echo $scn; ?>" style="background-color:white;" readonly>    
-                            </div>
-                            <div class="col-md-12">
                               <label>Supplier</label>
-                              <input type="text" class="form-control" name="sc_name" value="<?php echo $sn; ?>" style="background-color:white;" readonly>       
+                              <select class="form-control" id="supp" name="supp" tabindex="6">
+                                <option value="" disabled selected>Select Supplier</option>
+                                  <?php 
+                                    $display_supplier=mysqli_query($open_connection,"SELECT * FROM tbl_supplier") or die(mysqli_error($open_connection));
+                                    $i=1;
+                                    while($row=mysqli_fetch_array($display_supplier)){
+                                      $Supplier_ID=$row['supplier_ID'];
+                                      $Supp_Name=$row['supplier_name'];
+                                  ?>
+                                <option value="<?php echo $Supplier_ID; ?>" <?php if ($Supplier_ID==$suid) { echo "selected";}?> ><?php echo $Supp_Name; ?></option>
+                                  <?php } ?> 
+                              </select>       
+                            </div>
+                            <div class="col-md-12">
+                              <div class="form-group">
+                                <label>Discontinued</label>
+                                <input type="checkbox" name="check_dis" id="check_dis" value="YES" <?php if($disc==1){ echo "checked";}?>>  
+                              </div>
                             </div>
                             <div class="col-md-12">
                               <div class="form-group">
                                 <label>Standard Price</label>
-                                <input type="text" class="form-control" id="StandardPrice" name="StandardPrice" placeholder="Standard Price" tabindex="7" value="<?php echo $sp; ?>" style="background-color:white;" readonly>
+                                <input type="text" class="form-control" id="StandardPrice" name="StandardPrice" placeholder="Standard Price" tabindex="7" onKeyPress="return number3(event)" step="any" value="<?php echo $sp; ?>">
                                 <label >List Price</label>
-                                <input type="text" class="form-control" id="ListPrice" name="ListPrice" placeholder="List Price" tabindex="8" value="<?php echo $lp; ?>" style="background-color:white;" readonly>
+                                <input type="text" class="form-control" id="ListPrice" name="ListPrice" placeholder="List Price" tabindex="8" onKeyPress="return number3(event)" value="<?php echo $lp; ?>">
                               </div>         
                             </div>  
-                            
+                            <div class="col-md-2">
+                              <button type="submit" name="ProductEdit" class="btn btn-default" tabindex="9">Save Changes</button>
+                            </div>
                           </div>
                         </div>  
-                      </form>
+                      </form>  
+              
                     </div>
-                    <div class="modal-footer">
-                      <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-                    </div>
-                  </div>
-                </div> 
-              </div>
-                          <?php } ?>
-                        </table>
-                      </div>
                       <div class="panel-footer">
                         <div class="row">
                           <div class="col-md-6">
-                            <button type="button" class="btn btn-success" title="Add Product" data-toggle="modal" data-target="#AddProduct">Add Product</button>
+                            
                           </div>
                         </div>
                       </div>
@@ -443,92 +419,6 @@
                 </p>
               </footer>
     <!--===================================[ MODALS BELOW ]==============================================-->
-
-    <!--===================================[ ADD PRODUCT ]==============================================-->
-    <div id="AddProduct" class="modal fade" role="dialog">
-       <div class="modal-dialog">
-        <!-- Modal content-->
-        <div class="modal-content">
-          <div class="modal-header">
-            <button type="button" class="close" data-dismiss="modal">&times;</button>
-            <h4 class="modal-title">Add New Product</h4>
-          </div>
-          <div class="modal-body">
-            <form class="form-signin" method="post" enctype="multipart/form-data">
-              <div class="form-group">
-                <div class="row">
-                  <div class="col-md-6">
-                    <div class="col-md-12">
-                      <label for="Category">Barcode (Optional)</label>
-                      <input type="text" class="form-control" id="barcode" name="barcode" placeholder="Barcode" onmouseover="this.focus();" tabindex="1" onKeyPress="return number(event)">  
-                    </div>  
-                    <div class="col-md-12">
-                      <label>Product Name</label>   
-                      <input type="text" class="form-control" id="ProductName" name="ProductName" placeholder="Product Name" tabindex="3" onkeypress="return lenum(event)" required>
-                    </div>
-                  </div>
-                  
-                  <div class="col-md-6">
-                    <div class="input-group">
-                      <label>Product Image</label>
-                      <input type="file" name="file" id="image" class="form-control" placeholder="Image" required>
-                    </div>            
-                  </div>
-                  
-                  <div class="col-md-12">
-                    <label>Catergory</label>
-                    <select class="form-control" name="select_cat" id="select_cat" tabindex="4" onchange="showUser2(this.value)">
-                      <option value="" disabled selected>Select Category</option>
-                        <?php 
-                          $display_cat=mysqli_query($open_connection,"SELECT * FROM tbl_category") or die(mysqli_error($open_connection));
-                          $i=1;
-                          while($row=mysqli_fetch_array($display_cat)){
-                            $Cat_ID=$row['Category_ID'];
-                            $Cat_Name=$row['Category_Name'];
-                        ?>
-                      <option value="<?php echo $Cat_ID; ?>"><?php echo $Cat_Name; ?></option>
-                      <?php } ?>        
-                    </select>     
-                  </div>
-                  <div class="col-md-12">
-                    <div id="txtHint2"></div>       
-                  </div>
-                  <div class="col-md-12">
-                    <label>Supplier</label>
-                    <select class="form-control" id="supp" name="supp" tabindex="6">
-                      <option value="" disabled selected>Select Supplier</option>
-                        <?php 
-                          $display_supplier=mysqli_query($open_connection,"SELECT * FROM tbl_supplier") or die(mysqli_error($open_connection));
-                          $i=1;
-                          while($row=mysqli_fetch_array($display_supplier)){
-                            $Supplier_ID=$row['supplier_ID'];
-                            $Supp_Name=$row['supplier_name'];
-                        ?>
-                      <option value="<?php echo $Supplier_ID; ?>"><?php echo $Supp_Name; ?></option>
-                        <?php } ?> 
-                    </select>       
-                  </div>
-                  <div class="col-md-12">
-                    <div class="form-group">
-                      <label>Standard Price</label>
-                      <input type="text" class="form-control" id="StandardPrice" name="StandardPrice" placeholder="Standard Price" tabindex="7" onKeyPress="return number3(event)">
-                      <label >List Price</label>
-                      <input type="text" class="form-control" id="ListPrice" name="ListPrice" placeholder="List Price" tabindex="8" onKeyPress="return number3(event)">
-                    </div>         
-                  </div>  
-                  <div class="col-md-2">
-                    <button type="submit" name="ProductSubmit" class="btn btn-default" tabindex="9">Submit</button>
-                  </div>
-                </div>
-              </div>  
-            </form>
-          </div>
-          <div class="modal-footer">
-            <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-          </div>
-        </div>
-      </div> 
-
     <!-- ============================================================[ USER ACCOUNT SETTINGS ]==========================================================-->
     <div  class="modal fade" id="accountSettings" tabindex="-1" role="dialog" >
       <div class="modal-dialog">
@@ -618,6 +508,34 @@
               }
           });
         </script>
-             
+        <script type="text/javascript">
+            $('#editModal').on('show.bs.modal', function(e) {
+              var Users = $(e.relatedTarget).data('id');
+              $(e.currentTarget).find('input[name="productID"]').val( Users[0] );
+              $(e.currentTarget).find('input[name="barcode"]').val( Users[1] );
+              $(e.currentTarget).find('input[name="ProductName"]').val( Users[2]);
+              $(e.currentTarget).find('select[name="select_cat"]').val( Users[3] );
+            
+
+              $(e.currentTarget).find('select[name="supp"]').val( Users[5] );
+              if (Users[6] == 1) {
+                document.getElementById("check_dis").checked = true;  
+              }
+              else{
+                document.getElementById("check_dis").checked = false;
+              }
+              
+              
+              $(e.currentTarget).find('input[name="StandardPrice"]').val( Users[7] );
+              $(e.currentTarget).find('input[name="ListPrice"]').val( Users[8] );
+              var src1 = Users[9];
+              $("#img_display").attr("src",src1);
+              
+
+
+            });
+
+            
+          </script>       
   </body>
 </html>

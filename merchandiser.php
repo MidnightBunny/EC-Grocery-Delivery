@@ -75,13 +75,8 @@
             <div class="side-menu-container">
               <ul class="nav navbar-nav">
                 <li class="active"><a href="#"><span class="glyphicon glyphicon-dashboard"></span> Dashboard</a></li>
-                <li><a href="category.php"><span class="fa fa-tasks"></span> Category</a></li>
-                <li><a href="supplier.php"><span class="fa fa-truck"></span> Supplier</a></li>
-                <li><a href="products.php"><span class="fa fa-shopping-bag"></span> Items</a></li>
                 <li><a href="inventory.php"><span class="fa fa-pie-chart"></span> Inventory</a></li>
                 <li><a href="reports.php"><span class="fa fa-database"></span> Reports</a></li>
-                <li><a href="orders.php"><span class="fa fa-list"></span> Orders</a></li>
-
                 
               </ul>
             </div><!-- /.navbar-collapse -->

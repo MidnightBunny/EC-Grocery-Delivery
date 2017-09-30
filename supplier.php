@@ -155,6 +155,7 @@ else{
   
     $(document).ready(function(){
         $('#myTable').DataTable();});
+    
     </script>
 
     </head>
@@ -238,7 +239,7 @@ else{
                           <th>Address</th>
                           <th>Landline</th>
                           <th>Contact No.</th>
-                          <th>Actions</th>
+                          <th class="no-sort">Actions</th>
                           
                           
                         </tr>
