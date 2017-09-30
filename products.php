@@ -23,17 +23,19 @@
       $supp=$_POST['supp'];
       $sp=$_POST['StandardPrice'];
       $lp=$_POST['ListPrice'];
+
+      $quantity=$_POST['quantity'];
       $disc = 0;
       $storedFile="images/products/".basename($_FILES["file"]["name"]);
       move_uploaded_file($_FILES["file"]["tmp_name"], $storedFile);
-      mysqli_query($open_connection,"INSERT into tbl_products(`barcode`, `product_name`, `Category_ID`, `SCat_ID`, `supplier_ID`, `standard_price`, `list_price`, `discontinue`, `image`)VALUES('$bc','$pName','$cat','$scat','$supp',$sp,$lp,$disc,'$storedFile')") or die(mysqli_error($open_connection));
-      $id=mysqli_insert_id($open_connection);
+      mysqli_query($open_connection,"INSERT into tbl_products(`barcode`, `product_name`, `Category_ID`, `SCat_ID`, `supplier_ID`, `standard_price`, `list_price`, `discontinue`, `image`,`quantity`)VALUES('$bc','$pName','$cat','$scat','$supp',$sp,$lp,$disc,'$storedFile','$quantity')") or die(mysqli_error($open_connection));
+      $id=mysqli_insert_id('$id');
+
       mysqli_query($open_connection,"INSERT into tbl_inventory(product_ID) VALUES($id)") or die(mysqli_error($open_connection));  
     }
   //=========================================================[ EDIT PRODUCT ]============================================================
   if(isset($_POST['ProductEdit']))
     {
-
       $bc=$_POST['barcode'];  
       $pID=$_POST['productID'];    
       $pName=$_POST['ProductName'];
@@ -48,6 +50,7 @@
       }
       else{
         $disc = 0;
+
       }
       $storedFile="images/products/".basename($_FILES["file"]["name"]);
       if ($storedFile == "images/products/") {
@@ -57,13 +60,14 @@
         move_uploaded_file($_FILES["file"]["tmp_name"], $storedFile);
         mysqli_query($open_connection,"UPDATE tbl_products SET `barcode`='$bc',`product_name`='$pName',`Category_ID`=$cat,`supplier_ID`=$supp,`standard_price`=$sp,`list_price`=$lp,`discontinue`=$disc,`image`='$storedFile' WHERE product_ID=$pID"); 
       }
-      
     }
 ?>
 <!DOCTYPE html>
 <html>
  <head>
-  	<title>Product</title>
+
+    <title>Product</title>
+
     <meta charset="utf-8"> 
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <script src="Assets/js/jquery-1.10.2.min.js"></script>
@@ -71,7 +75,9 @@
     <link rel="stylesheet" type="text/css" href="Assets/font-awesome/css/font-awesome.min.css" />
     <link rel="stylesheet" href="Assets/bootstrap/css/admin_style.css"/>
     <link rel="stylesheet" href="Assets/bootstrap/css/bootstrap.css"/>
+     <link rel="stylesheet" href="Assets/css/nav.css"/> 
     <script src="Assets/js/admin_style.js"></script>
+     <link rel="stylesheet" href="Assets/css/nav.css"/> 
     <script src="Assets/bootstrap/js/jquery.min.js"></script>
     <script src="Assets/bootstrap/js/bootstrap.js"></script>
     <script type="text/javascript" src="js/shieldui-all.min.js"></script>
@@ -84,6 +90,7 @@
     <script type="text/javascript" src="DataTables/js/dataTables.bootstrap.min.js"></script>  
     <script type="text/javascript">
 
+
     $(document).ready( function() {
       $('#myTable').DataTable({
         "aoColumnDefs" : [ {
@@ -92,11 +99,13 @@
         
       });
     });
+
     </script>
 
     <script type="text/javascript">
       function showCat(str) {
           if (str == "") {
+
               return;
           } else { 
               if (window.XMLHttpRequest) {
@@ -138,7 +147,31 @@
           }
       }
 
+      function showUser2(str) {
+          if (str == "") {
+              document.getElementById("txtHint2").innerHTML = "";
+              return;
+          } else { 
+              if (window.XMLHttpRequest) {
+                  // code for IE7+, Firefox, Chrome, Opera, Safari
+                  xmlhttp = new XMLHttpRequest();
+              } else {
+                  // code for IE6, IE5
+                  xmlhttp = new ActiveXObject("Microsoft.XMLHTTP");
+              }
+              xmlhttp.onreadystatechange = function() {
+                  if (this.readyState == 4 && this.status == 200) {
+                      document.getElementById("txtHint2").innerHTML = this.responseText;
+                  }
+              };
+              xmlhttp.open("GET","getcategory2.php?q="+str,true);
+              xmlhttp.send();
+          }
+      }
+
       // Keypress
+
+     
     
         function letter(e) 
         { 
@@ -165,7 +198,7 @@
                 else return true; 
                 keychar = String.fromCharCode(key); 
                 keychar = keychar.toLowerCase(); 
-                if ((("0123456789").indexOf(keychar) > -1))
+                if ((("0123456789.").indexOf(keychar) > -1))
                     return true; 
                 else 
                     return false; 
@@ -185,23 +218,24 @@
                 else 
                     return false; 
         }
-        function number3(e) 
-        { 
-            var key; var keychar; var a;
-                if (window.event) 
-                    key = window.event.keyCode; 
-                else if (e) 
-                    key = e.which; 
-                else return true; 
-                keychar = String.fromCharCode(key); 
-                keychar = keychar.toLowerCase(); 
-                if ((("0123456789.").indexOf(keychar) > -1)){
-                  return true;
-                }
-                     
-                else 
-                    return false; 
-        }   
+                    
+                $("StandardPrice").keypress(function(event) {
+                    if(event.which == 8 || event.which == 0){
+                    return true;
+                      }
+                    if(event.which < 46 || event.which > 59) {
+                    return false;
+                    //event.preventDefault();
+
+                    }              
+                     // prevent if not number/dot
+    
+    if(event.which == 46 && $(this).val().indexOf('.') != -1) {
+        return false;
+        //event.preventDefault();
+    } // prevent if already dot
+});
+
         function lenum(e) 
         { 
             var key; var keychar; 
@@ -236,10 +270,15 @@
     
     </script>
 
+    <script type="text/javascript">
+      
+    </script>
+
     </head>
   
 
-  <body >
+  <body>
+
     <nav class="navbar navbar-default navbar-static-top" style="background-color: #7f0000;>
       <div class="container-fluid">
         <!-- Brand and toggle get grouped for better mobile display -->
@@ -259,7 +298,6 @@
               Welcome, <?php echo "{$firstname} {$lastname}";?>
               <span class="caret"></span></a>
               <ul class="dropdown-menu" role="menu">
-                <li class="dropdown-header">SETTINGS</li>
                 <li><a href="#" data-toggle="modal" data-target="#accountSettings"><i class="fa fa-user fa-fw"></i>Profile</li>
                
                 <li class="divider"></li>
@@ -324,8 +362,9 @@
                 </thead>
                 <tr>
                 <?php 
-                          $sql_display="SELECT product_ID,barcode,product_name,p.Category_ID,Category_Name,p.SCat_ID,SubCategory_Name,s.supplier_ID,supplier_name,standard_price,list_price,discontinue,image FROM tbl_products p INNER JOIN tbl_category USING(`Category_ID`) INNER JOIN tbl_subcategory USING (`SCat_ID`) Inner JOIN tbl_supplier s USING (`supplier_ID`) ORDER BY product_ID ASC";
-                          
+
+                       $sql_display="SELECT product_ID,barcode,product_name,p.Category_ID,Category_Name,p.SCat_ID,SubCategory_Name,s.supplier_ID,supplier_name,standard_price,list_price,discontinue,image FROM tbl_products p INNER JOIN tbl_category USING(`Category_ID`) INNER JOIN tbl_subcategory USING (`SCat_ID`) Inner JOIN tbl_supplier s USING (`supplier_ID`) ORDER BY product_ID ASC";
+
                           $display_users=mysqli_query($open_connection,$sql_display) or die(mysqli_error($open_connection));
                             
                             while($row=mysqli_fetch_array($display_users)){
@@ -366,55 +405,66 @@
                    
                   </td>
                 </tr>
-                
+    
               <div id="viewModal<?php echo $id; ?>" class="modal fade" role="dialog">
                  <div class="modal-dialog">
                   <!-- Modal content-->
                   <div class="modal-content">
                     <div class="modal-header">
                       <button type="button" class="close" data-dismiss="modal">&times;</button>
-                      <h4 class="modal-title">View Product Information</h4>
+                      <h4 class="modal-title">Product Information</h4>
                     </div>
                     <div class="modal-body">
                       <form class="form-signin" method="post" enctype="multipart/form-data">
-                        <div class="form-group">
-                          <div class="row">
-                            <div class="col-md-6">
-                              <label>Barcode</label>
-                              <input type="text" class="form-control" id="barcode" name="barcode" placeholder="Barcode" tabindex="1" onKeyPress="return number(event)" value="<?php echo $bc; ?>" style="background-color:white;" readonly>  
-                              <label>Product Name</label>   
+
+                     <img src="<?php echo $img_display; ?>" style="width:200px;height:200px;margin-left: 200px;">  
+                     <hr>
+                      <div class="row">
+                    <div class="col-md-6" style="margin-bottom: 10px;">
+                          <div class="input-group">
+                              <span class="input-group-addon">Name</span>  
                               <input type="text" class="form-control" id="ProductName" name="ProductName" placeholder="Product Name" tabindex="3" value="<?php echo $pn; ?>" style="background-color:white;" readonly>
-                            </div>
-                            <div class="col-md-6">
-                              <div class="input-group">
-                                <img src="<?php echo $img_display; ?>" style="width:100px;height:100px">
-                                
-                              </div>            
-                            </div>
-                            <div class="col-md-12">
-                              <label>Catergory</label>
-                              <input type="text" class="form-control" name="c_name" value="<?php echo $cn; ?>" style="background-color:white;" readonly>    
-                            </div>
-                            <div class="col-md-12">
-                              <label>Sub Catergory</label>
-                              <input type="text" class="form-control" name="sc_name" value="<?php echo $scn; ?>" style="background-color:white;" readonly>    
-                            </div>
-                            <div class="col-md-12">
-                              <label>Supplier</label>
-                              <input type="text" class="form-control" name="sc_name" value="<?php echo $sn; ?>" style="background-color:white;" readonly>       
-                            </div>
-                            <div class="col-md-12">
-                              <div class="form-group">
-                                <label>Standard Price</label>
-                                <input type="text" class="form-control" id="StandardPrice" name="StandardPrice" placeholder="Standard Price" tabindex="7" value="<?php echo $sp; ?>" style="background-color:white;" readonly>
-                                <label >List Price</label>
-                                <input type="text" class="form-control" id="ListPrice" name="ListPrice" placeholder="List Price" tabindex="8" value="<?php echo $lp; ?>" style="background-color:white;" readonly>
-                              </div>         
-                            </div>  
-                            
                           </div>
-                        </div>  
+                        </div>
+
+                       <div class="col-md-6" style="margin-bottom: 10px;">
+                          <div class="input-group">
+                              <span class="input-group-addon">Category</span>
+                              <input type="text" class="form-control" name="c_name" value="<?php echo $cn; ?>" style="background-color:white;" readonly>    
+                          </div>
+                        </div>
+
+                       <div class="col-md-6" style="margin-bottom: 10px;">
+                         <div class="input-group">
+                              <span class="input-group-addon">Sub-Category</span>
+                              <input type="text" class="form-control" name="sc_name" value="<?php echo $scn; ?>" style="background-color:white;" readonly>    
+                          </div>
+                        </div>
+
+                        <div class="col-md-6" style="margin-bottom: 10px;">
+                         <div class="input-group">
+                              <span class="input-group-addon">Supplier</span>
+                              <input type="text" class="form-control" name="sc_name" value="<?php echo $sn; ?>" style="background-color:white;" readonly>       
+                          </div>
+                        </div>
+
+                        <div class="col-md-6" style="margin-bottom: 10px;">
+                         <div class="input-group">
+                            <span class="input-group-addon"> Standard Price</span>
+                              <input type="text" class="form-control" id="StandardPrice" name="StandardPrice" placeholder="Standard Price" tabindex="7" value="<?php echo $sp; ?>" style="background-color:white;" readonly>    
+                          </div>
+                        </div>
+
+                        <div class="col-md-6" style="margin-bottom: 10px;">
+                         <div class="input-group">
+                              <span class="input-group-addon">List Price</span>
+                                <input type="text" class="form-control" id="ListPrice" name="ListPrice" placeholder="List Price" tabindex="8" value="<?php echo $lp; ?>" style="background-color:white;" readonly>
+                          </div>  
+                        </div>
+
                       </form>
+                      </div>
+                      
                     </div>
                     <div class="modal-footer">
                       <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
@@ -422,6 +472,9 @@
                   </div>
                 </div> 
               </div>
+                   
+
+
                           <?php } ?>
                         </table>
                       </div>
@@ -456,27 +509,35 @@
           <div class="modal-body">
             <form class="form-signin" method="post" enctype="multipart/form-data">
               <div class="form-group">
-                <div class="row">
-                  <div class="col-md-6">
-                    <div class="col-md-12">
+               <div class="row">
+                   <div class="col-md-6" style="margin-bottom: 20px;">
+                    <div class="input-group">
                       <label for="Category">Barcode (Optional)</label>
                       <input type="text" class="form-control" id="barcode" name="barcode" placeholder="Barcode" onmouseover="this.focus();" tabindex="1" onKeyPress="return number(event)">  
                     </div>  
-                    <div class="col-md-12">
-                      <label>Product Name</label>   
-                      <input type="text" class="form-control" id="ProductName" name="ProductName" placeholder="Product Name" tabindex="3" onkeypress="return lenum(event)" required>
+
                     </div>
-                  </div>
-                  
-                  <div class="col-md-6">
-                    <div class="input-group">
+
+                    <div class="col-md-6">
                       <label>Product Image</label>
                       <input type="file" name="file" id="image" class="form-control" placeholder="Image" required>
-                    </div>            
-                  </div>
-                  
-                  <div class="col-md-12">
-                    <label>Catergory</label>
+
+                    </div>
+
+                    </div>
+                    <div class="row">
+                   <div class="col-md-6"> 
+                 <div class="input-group">
+                 <span class="input-group-addon" id="basic-addon1">Product Name&nbsp</span>
+                       
+                      <input type="text" class="form-control" id="ProductName" name="ProductName" placeholder="Product Name" tabindex="3">
+                    </div>
+                    </div>
+
+                     <div class="col-md-6" style="margin-bottom: 20px;"> 
+                 <div class="input-group">
+                 <span class="input-group-addon" id="basic-addon1">Category</span>
+
                     <select class="form-control" name="select_cat" id="select_cat" tabindex="4" onchange="showUser2(this.value)">
                       <option value="" disabled selected>Select Category</option>
                         <?php 
@@ -490,11 +551,15 @@
                       <?php } ?>        
                     </select>     
                   </div>
-                  <div class="col-md-12">
-                    <div id="txtHint2"></div>       
-                  </div>
-                  <div class="col-md-12">
-                    <label>Supplier</label>
+
+                 </div>
+                 </div>
+                 <div class="row">
+                 
+                <div class="col-md-6"> 
+                 <div class="input-group">
+                 <span class="input-group-addon" id="basic-addon1">Supplier Name</span>
+
                     <select class="form-control" id="supp" name="supp" tabindex="6">
                       <option value="" disabled selected>Select Supplier</option>
                         <?php 
@@ -506,29 +571,47 @@
                         ?>
                       <option value="<?php echo $Supplier_ID; ?>"><?php echo $Supp_Name; ?></option>
                         <?php } ?> 
-                    </select>       
+                    </select>     
+                 </div>
+                 </div>
+                 <div class="col-md-6" style="margin-bottom: 20px;"> 
+                 <div class="input-group">
+                 <span class="input-group-addon" id="basic-addon1">Quantity&nbsp</span>
+                  <input type="text" name="quantity" id="quantity" class="form-control"  
+                  onKeyPress="return number2(event)"  maxlenght="50" placeholder="Quantity Per Unit" required="">
+                    </div>
                   </div>
-                  <div class="col-md-12">
-                    <div class="form-group">
-                      <label>Standard Price</label>
-                      <input type="text" class="form-control" id="StandardPrice" name="StandardPrice" placeholder="Standard Price" tabindex="7" onKeyPress="return number3(event)">
-                      <label >List Price</label>
-                      <input type="text" class="form-control" id="ListPrice" name="ListPrice" placeholder="List Price" tabindex="8" onKeyPress="return number3(event)">
+
+                 </div>
+                  <div class="row">
+                    <div class="col-md-6"> 
+                    <div class="input-group">
+                        <span class="input-group-addon" id="basic-addon1">Standard Price</span>
+                      <input type="text" class="form-control" id="StandardPrice" name="StandardPrice" placeholder="Standard Price" tabindex="7" onKeyPress="return number2(event)">
+                    </div>
+                    </div>
+                    <div class="col-md-6"> 
+                    <div class="input-group">
+                    <span class="input-group-addon" id="basic-addon1">List Price</span>
+                    <input type="text" class="form-control" id="ListPrice" name="ListPrice" placeholder="List Price" tabindex="8" onKeyPress="return number2(event)">
                     </div>         
-                  </div>  
-                  <div class="col-md-2">
-                    <button type="submit" name="ProductSubmit" class="btn btn-default" tabindex="9">Submit</button>
-                  </div>
+                    </div>
+                    </div>
+                    
+
+                
                 </div>
-              </div>  
+              
             </form>
           </div>
           <div class="modal-footer">
+           <button type="submit" name="ProductSubmit" class="btn btn-success" tabindex="9">Submit</button>
             <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
           </div>
         </div>
       </div> 
 
+    </div>
     <!-- ============================================================[ USER ACCOUNT SETTINGS ]==========================================================-->
     <div  class="modal fade" id="accountSettings" tabindex="-1" role="dialog" >
       <div class="modal-dialog">
@@ -617,7 +700,14 @@
                   $next.focus();
               }
           });
-        </script>
-             
+
+          $('#StandardPrice').keypress(function(event) {
+    if (((event.which != 46 || (event.which == 46 && $(this).val() == '')) ||
+            $(this).val().indexOf('.') != -1) && (event.which < 48 || event.which > 57)) {
+        event.preventDefault();
+    }
+}).on('paste', function(event) {
+    e
+         </script>       
   </body>
 </html>
