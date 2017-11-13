@@ -78,6 +78,7 @@ include 'connection.php';
         $Semail=$_POST['Semail'];
         $Scontact_no=$_POST['Scontact_no'];
 
+
         $selectquery="SELECT * FROM tbl_supplier WHERE supplier_name='$supplier_name'";
         $result=mysqli_query($con, $selectquery );
 
@@ -191,7 +192,7 @@ swal("Here's the title!", "...and here's the text!");
                 else return true; 
                 keychar = String.fromCharCode(key); 
                 keychar = keychar.toLowerCase(); 
-                if ((("ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz ").indexOf(keychar) > -1)) 
+                if ((("ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz").indexOf(keychar) > -1)) 
                     return true;
                 else 
                     return false; 
@@ -211,6 +212,24 @@ swal("Here's the title!", "...and here's the text!");
                 else 
                     return false; 
         }
+
+         function lenum(e) 
+        { 
+            var key; var keychar; 
+                if (window.event) 
+                    key = window.event.keyCode; 
+                else if (e) 
+                    key = e.which; 
+                else return true; 
+                keychar = String.fromCharCode(key); 
+                keychar = keychar.toLowerCase(); 
+                if ((("ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz 0123456789").indexOf(keychar) > -1))
+                    return true; 
+                else 
+                    return false; 
+        } 
+
+
     </script>
     
 </head>
@@ -248,6 +267,7 @@ swal("Here's the title!", "...and here's the text!");
     </div>
     <!-- /container -->
 </div>
+
 
 <!-- /Header -->
 
@@ -293,7 +313,7 @@ swal("Here's the title!", "...and here's the text!");
                                   
                                     <div class="input-group">
                                     <span class="input-group-addon" id="basic-addon1">Supplier Name</span>
-                                        <input type="text" name="supplier_name" id="supplier_name" class="form-control"   maxlength="20" placeholder="Supplier Name" required=""  >
+                                        <input type="text" name="supplier_name" id="supplier_name" class="form-control"   maxlength="20" placeholder="Supplier Name" onKeyPress="return lenum(event)" required=""  >
                                    
                                   </div>
                                   </div>
@@ -393,7 +413,9 @@ swal("Here's the title!", "...and here's the text!");
                                 <div class="col-sm-12" style="margin-top: 10px;">
                               <div class="input-group">
                                 <span class="input-group-addon" id="basic-addon1">Supplier Name</span>
-                                <input type="text" name="supplier_name"  class="form-control" aria-describedby="basic-addon1" value="<?php echo $supplier_name_selected?>" onkeypress="return lenum(event)" >
+
+                                <input type="text" name="supplier_name"  class="form-control" aria-describedby="basic-addon1" value="<?php echo $supplier_name_selected?>" onKeyPress="return lenum(event)">
+
                               </div>
                             </div>
 
@@ -531,9 +553,6 @@ swal("Here's the title!", "...and here's the text!");
                            </div>
                            </div>
                            <div class="col-sm-1"></div>
-
-
-
 
                         </div>
                           </div>
