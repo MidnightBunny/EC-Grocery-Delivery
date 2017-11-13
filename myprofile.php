@@ -16,12 +16,52 @@ include 'connection.php';
   else{
           header("location:dashboard.php");
       } 
+
+ if(isset($_POST['edit_profile']))
+      {
+        if($_FILES['file']['name']==""){
+      
+        $id=$_POST['ids'];
+        $firstname=$_POST['firstname'];    
+        $lastname=$_POST['lastname'];
+        $username=$_POST['username'];
+        $userlevel=$_POST['userlevel'];
+
+        $_SESSION['firstname'] =$firstname;
+        $_SESSION['lastname'] =$lastname;
+        $_SESSION['username'] =$username;
+        mysqli_query($open_connection,"UPDATE tbl_user SET firstname='$firstname',lastname='$lastname',username='$username',userlevel='$userlevel' WHERE id='$id'") or die(mysqli_error($open_connection)); 
+
+        echo "<script type='text/javascript'>
+                alert('Account Successfully Updated!');
+                open('dashboard.php','_self');
+                </script>";  
+
+                 }
+        else{
+        $id=$_POST['ids'];
+        $firstname=$_POST['firstname'];    
+        $lastname=$_POST['lastname'];
+        $username=$_POST['username'];
+        $password=md5($_POST['lastname']);
+        $pass = md5($password);
+        $userlevel=$_POST['userlevel'];
+        $storedFile="images/posts/".basename($_FILES["file"]["name"]);
+        $_SESSION['image'] = $storedFile;
+        move_uploaded_file($_FILES["file"]["tmp_name"], $storedFile);
+        mysqli_query($open_connection,"UPDATE tbl_user SET firstname='$firstname',lastname='$lastname',username='$username',userlevel='$userlevel',image='$storedFile' WHERE id='$id'") or die(mysqli_error($open_connection)); 
+
+         echo "<script type='text/javascript'>
+                alert('Account Successfully Updated!');
+                open('dashboard.php','_self');
+                </script>";  
+                  } 
+                }
 ?>
 <?php 
 $ord=mysqli_query($open_connection,"SELECT *  FROM tbl_orders");
 $myord=mysqli_num_rows($ord);
 ?>
-
 <?php 
 if(isset($_POST['notify']))
     {
@@ -37,8 +77,8 @@ $custord=mysqli_num_rows($ords);
 <html>
 <head>
     <meta charset="utf-8" />
-    <title>Order</title>
-    <link href="assets/images/ec.png" rel="icon" type="image">
+    <title>Edit Profile</title>
+        <link href="assets/images/ec.png" rel="icon" type="image">
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
     <link rel="stylesheet" type="text/css" href="Assets/bootstrap/css/bootstrap.css" />
@@ -46,6 +86,24 @@ $custord=mysqli_num_rows($ords);
     <link rel="stylesheet" type="text/css" href="Assets/css/panel.css" />
     <script type="text/javascript" src="Assets/js/jquery-1.10.2.min.js"></script>
     <script type="text/javascript" src="Assets/bootstrap/js/bootstrap.min.js"></script>
+    <script type="text/javascript">
+
+    function letter(e) 
+        { 
+            var key; var keychar; 
+                if (window.event) 
+                    key = window.event.keyCode; 
+                else if (e)   
+                    key = e.which; 
+                else return true; 
+                keychar = String.fromCharCode(key); 
+                keychar = keychar.toLowerCase(); 
+                if ((("ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz ").indexOf(keychar) > -1)) 
+                    return true;
+                else 
+                    return false; 
+        }
+        </script>
 </head>
 <body>
 <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" type="text/css" rel="stylesheet">
@@ -89,33 +147,74 @@ $custord=mysqli_num_rows($ords);
 
     <ul class="nav nav-pills nav-stacked" style="border-right:1px solid black">
         <li class="nav-header"><center><img src="<?php echo $image?>" class="img-circle" style="height: 90px;width: 90px;"></center></li>
-        <li class="nav-header"><center><label><?php echo "{$firstname} {$lastname}";?>
+        <li class="nav-header"><center><label><?php echo "{$firstname} {$lastname}";?> 
         <a data-toggle="modal" data-target="#accountSettings"> <span class="fa fa-cog"></span></a></label></center></li>
         <li><center><span style="font-size:12px;"><?php echo date(" F j, Y "); ?></span></center></li>
         <li><hr style="width: 50%"></li>
         <li><a href="dashboard.php"><i class="fa fa-dashboard"></i> Dashboard</a></li>
         <li><a href="product.php"><i class="fa fa-shopping-bag"></i> Products</a></li>
-       
         <li><a href="supplier.php"><i class="fa fa-truck"></i> Suppliers</a></li>
-        <li class="active"><a href="orders.php"><i class="fa fa-check-square-o"></i> Orders</a></li>
+        <li><a href="orders.php"><i class="fa fa-check-square-o"></i> Orders</a></li>
         <li><a href="customers.php"><i class="fa fa-address-book"></i> Customers</a></li>
         <li><a href="reports.php"><i class="fa fa-book"></i> Reports</a></li>
         <li><a href="users.php"><i class="fa fa-users"></i> User Management</a></li>
-        <li><a href=myprofile.php><i class="fa fa-id-badge"></i> Profile Settings</a></li>
+        <li class="active"><a href="myprofile.php"><i class="fa fa-id-badge"></i> Profile Settings</a></li>
 
     </ul>
 </div><!-- /span-3 -->
 <div class="col-lg-10">
     <!-- Right -->
 
-    <a href="#"><strong><span class="fa fa-check-square-o"></span> Customer Orders</strong></a>
+    <a href="#"><strong><span class="fa fa-id-badge"></span> Profile Settings</strong></a>
     <hr>
     <div class="col-sm-12">
   <div class="panel panel-danger">
     <div class="panel-heading"></div>
     <div class="panel-body">
-       
+            <div class="col-sm-12">
+                <div class="col-sm-2"></div>
+                <div class="col-sm-4"> <div>
+                                     <center><img src="<?php echo $image?>" style="width:300px;height:300px"/></center> 
+                                     </div></div>
+                <div class="col-sm-4">
+                     <form method="post" class="form-horizontal" enctype="multipart/form-data">
+              <div class="row">
+                <div class="col-sm-12">
+                  <div class="input-group">
+                                   
+                    <div>
+                    <label class="form-label">Username</label> 
+                    </div>
+                    <input type="hidden" name="ids" value="<?php echo $ids?>" class="form-control" style="margin-bottom:10px;">
+                    <input type="text" name="username" id="username" value="<?php echo $usernames; ?>" class="form-control"  onKeyPress="return letter(event)" >
+                    <div>
+                    <label class="form-label">First Name</label>
+                    </div>
+                    <input type="text" name="firstname" id="firstname" class="form-control" aria-describedby="basic-addon1" value="<?php echo $firstname; ?>" onKeyPress="return letter(event)" >
+                    
+                    
+                    <div>
+                    <label>Last Name</label>
+                    </div>
+                    <input type="text"  name="lastname" id="lastname" placeholder="lastname" class="form-control" aria-describedby="basic-addon1" value="<?php echo $lastname; ?>" style="margin-bottom: 10px;" onKeyPress="return letter(event)" >
+                    <input type="hidden" name="userlevel" id="userlevel" value="<?php echo $userlevel?>" class="form-control" style="margin-bottom:10px;">
+                    <div>
+                    <label>Upload</label>
+                    </div>
+                    <input type="file" name="file"  class="form-control" aria-describedby="basic-addon1" >
+
+                   
+                  </div>
+                </div> 
+                <button type="submit" class="btn btn-danger " name="edit_profile" style="margin-top:20px;margin-left: 80px; width:50%">Update</button>
+
+              </div>
+            </form>
+            </div>
                 </div>
+                <div class="col-sm-2"></div>
+            </div>                
+        </div>
     </div>
   </div>
 </div>

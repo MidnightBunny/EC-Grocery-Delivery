@@ -17,27 +17,24 @@ include 'connection.php';
           header("location:dashboard.php");
       } 
 ?>
+<?php
+  if(isset($_POST['deleteUser']))
+    {
+      $no=$_POST['id'];
+        mysql_query("DELETE from tbl_customer WHERE id='$no'") or die(mysql_error());
+        header("location:customers.php");
+    }
+    
+?>
 <?php 
 $ord=mysqli_query($open_connection,"SELECT *  FROM tbl_orders");
 $myord=mysqli_num_rows($ord);
-?>
-
-<?php 
-if(isset($_POST['notify']))
-    {
-        $no=$_POST['ord_id'];
-        mysqli_query($open_connection,"UPDATE tbl_custorder SET order_noti='0'") or die(mysqli_error($open_connection));
-        header("location:orders.php");   
-      }
-
-$ords=mysqli_query($open_connection,"SELECT *  FROM tbl_custorder where order_noti='1'");
-$custord=mysqli_num_rows($ords);
 ?>
 <!DOCTYPE html>
 <html>
 <head>
     <meta charset="utf-8" />
-    <title>Order</title>
+    <title>Pending supplier orders</title>
     <link href="assets/images/ec.png" rel="icon" type="image">
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
@@ -46,6 +43,20 @@ $custord=mysqli_num_rows($ords);
     <link rel="stylesheet" type="text/css" href="Assets/css/panel.css" />
     <script type="text/javascript" src="Assets/js/jquery-1.10.2.min.js"></script>
     <script type="text/javascript" src="Assets/bootstrap/js/bootstrap.min.js"></script>
+            <script type="text/javascript" src="DataTables/js/jquery.dataTables.min.js"></script>   
+    <script type="text/javascript" src="DataTables/js/dataTables.bootstrap.min.js"></script> 
+        <link rel="stylesheet" type="text/css" href="DataTables/css/jquery.dataTables.min.css" />
+    <script type="text/javascript">
+      $(document).ready( function() {
+      $('#myTable').DataTable({
+        "order":[],
+        "aoColumnDefs" : [ {
+        "bSortable" : false,
+        "aTargets" : [ "no-sort" ]}]
+        
+      });
+    });
+    </script>
 </head>
 <body>
 <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" type="text/css" rel="stylesheet">
@@ -61,20 +72,10 @@ $custord=mysqli_num_rows($ords);
             <img id="logo-img" style="height: 60px;" class="logo-img navbar-brand" src="Assets/Images/ban.png"/>
         </div>
         <div class="navbar-collapse collapse">
-            <form method="post">
             <ul class="nav navbar-nav navbar-right">
-                <li style="margin-right: -15px;"><a href="#"><i class="fa fa-refresh" style="font-size:20px;"></i> <span class="label label-danger">0</span></a></li>
-                  <input type="hidden" name="ord_id" id="ord_id">  
-                <li style="margin-right: -10px;">
-                    <button type="submit" name="notify" style="margin-top:14px; background-color: #7f0000;border: none;color:white;">
-                        <i class="fa fa-shopping-cart" style="font-size:20px;"></i>
-                        <span class="label label-danger"><?php echo $custord," "; ?></span>
-                    </button>
-                </li>
-             </form>
-                <li><a  href="supp_orders.php"><i class="fa fa-truck" style="font-size:20px;"></i> <span class="label label-danger"><?php echo $myord," "; ?></span></a></li>
-
-                <li><a   href="logout.php"><i class="fa fa-sign-out"></i> Logout</a></li>
+                <li style="margin-right: -15px;"><a href="#"><i class="fa fa-shopping-cart" style="font-size:20px;"></i> <span class="label label-danger">0</span></a></li>
+                <li><a href="#"><i class="fa fa-truck" style="font-size:20px;"></i> <span class="label label-danger"><?php echo $myord," "; ?></span></a></li>
+                <li><a href="logout.php"><i class="fa fa-sign-out"></i> Logout</a></li>
             </ul>
         </div>
     </div>
@@ -92,12 +93,12 @@ $custord=mysqli_num_rows($ords);
         <li class="nav-header"><center><label><?php echo "{$firstname} {$lastname}";?>
         <a data-toggle="modal" data-target="#accountSettings"> <span class="fa fa-cog"></span></a></label></center></li>
         <li><center><span style="font-size:12px;"><?php echo date(" F j, Y "); ?></span></center></li>
-        <li><hr style="width: 50%"></li>
+        <li><hr style="width: 50%;"></li>
         <li><a href="dashboard.php"><i class="fa fa-dashboard"></i> Dashboard</a></li>
         <li><a href="product.php"><i class="fa fa-shopping-bag"></i> Products</a></li>
-       
+        
         <li><a href="supplier.php"><i class="fa fa-truck"></i> Suppliers</a></li>
-        <li class="active"><a href="orders.php"><i class="fa fa-check-square-o"></i> Orders</a></li>
+        <li><a href="orders.php"><i class="fa fa-check-square-o"></i> Orders</a></li>
         <li><a href="customers.php"><i class="fa fa-address-book"></i> Customers</a></li>
         <li><a href="reports.php"><i class="fa fa-book"></i> Reports</a></li>
         <li><a href="users.php"><i class="fa fa-users"></i> User Management</a></li>
@@ -108,14 +109,60 @@ $custord=mysqli_num_rows($ords);
 <div class="col-lg-10">
     <!-- Right -->
 
-    <a href="#"><strong><span class="fa fa-check-square-o"></span> Customer Orders</strong></a>
+    <a href="#"><strong><span class="fa fa-truck"></span> Pending Supplier orders</strong></a>
     <hr>
     <div class="col-sm-12">
   <div class="panel panel-danger">
     <div class="panel-heading"></div>
     <div class="panel-body">
-       
-                </div>
+        <div class="">
+          <div>
+            <table class="table table-hover" id="myTable">
+              <thead>
+                <tr>
+                  <td>Barcode</td>
+                  <td>Product name</td>
+                  <td>Supplier</td>
+                  <td>Standard price</td>
+                  <td>Quantity</td>
+                  <td>Total</td>
+                  <td>Action</td>
+                  
+                </tr>
+              </thead>
+              <tbody>
+                <?php 
+                          $display_users=mysqli_query($open_connection,"SELECT * FROM tbl_orders") or die(mysqli_error($open_connection));
+                          
+                            $i=1;
+                            while($row=mysqli_fetch_array($display_users)){
+                              $order_id = $row['order_id'];
+                              $bc=$row['barcode'];
+                              $pn=$row['product_name'];
+                              $suid=$row['supplier_ID'];
+                              
+                              $sp=$row['standard_price'];
+                              $qt=$row['quantity'];
+                              $total=$row['total'];
+                ?>
+                <tr>
+                  <td><?php echo $row['barcode'];?></td>
+                  <td><?php echo $row['product_name'];?></td>
+                  <td><?php echo $row['supplier_ID']; ?></td>
+                  <td><?php echo $row['standard_price']; ?></td>
+                  <td><?php echo $row['quantity']; ?></td>
+                  <td><?php echo $row['total']; ?></td>
+                  <td style="padding-right: 0px"><a href="" type="button" class="btn btn-danger btn-sm" name=""><i class="fa fa-check"></i>Mark As Recieved</a></td>
+                </tr>
+                
+              </tbody>
+              <?php $i++;  } ?>
+              
+            </table>
+          
+          </div>
+        </div> 
+      </div>
     </div>
   </div>
 </div>

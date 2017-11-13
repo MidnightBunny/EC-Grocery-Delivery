@@ -78,6 +78,7 @@ include 'connection.php';
         $Semail=$_POST['Semail'];
         $Scontact_no=$_POST['Scontact_no'];
 
+
         $selectquery="SELECT * FROM tbl_supplier WHERE supplier_name='$supplier_name'";
         $result=mysqli_query($con, $selectquery );
 
@@ -211,6 +212,7 @@ swal("Here's the title!", "...and here's the text!");
                 else 
                     return false; 
         }
+
          function lenum(e) 
         { 
             var key; var keychar; 
@@ -265,6 +267,7 @@ swal("Here's the title!", "...and here's the text!");
     </div>
     <!-- /container -->
 </div>
+
 
 <!-- /Header -->
 
@@ -410,7 +413,9 @@ swal("Here's the title!", "...and here's the text!");
                                 <div class="col-sm-12" style="margin-top: 10px;">
                               <div class="input-group">
                                 <span class="input-group-addon" id="basic-addon1">Supplier Name</span>
+
                                 <input type="text" name="supplier_name"  class="form-control" aria-describedby="basic-addon1" value="<?php echo $supplier_name_selected?>" onKeyPress="return lenum(event)">
+
                               </div>
                             </div>
 
@@ -548,9 +553,6 @@ swal("Here's the title!", "...and here's the text!");
                            </div>
                            </div>
                            <div class="col-sm-1"></div>
-
-
-
 
                         </div>
                           </div>

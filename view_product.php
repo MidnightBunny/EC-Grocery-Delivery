@@ -1,3 +1,4 @@
+
 <?php
 include 'connection.php';
 
@@ -16,8 +17,10 @@ include 'connection.php';
   else{
           header("location:dashboard.php");
       } 
-?>
-<?php 
+
+  $sesID = $_SESSION['supplier_ID'];
+
+
 $ord=mysqli_query($open_connection,"SELECT *  FROM tbl_orders");
 $myord=mysqli_num_rows($ord);
 ?>
@@ -33,6 +36,7 @@ if(isset($_POST['notify']))
 $ords=mysqli_query($open_connection,"SELECT *  FROM tbl_custorder where order_noti='1'");
 $custord=mysqli_num_rows($ords);
 ?>
+
 <!DOCTYPE html>
 <html>
 <head>
@@ -97,7 +101,7 @@ $custord=mysqli_num_rows($ords);
         <li><a href="product.php"><i class="fa fa-shopping-bag"></i> Products</a></li>
        
         <li><a href="supplier.php"><i class="fa fa-truck"></i> Suppliers</a></li>
-        <li class="active"><a href="orders.php"><i class="fa fa-check-square-o"></i> Orders</a></li>
+        <li><a href="orders.php"><i class="fa fa-check-square-o"></i> Orders</a></li>
         <li><a href="customers.php"><i class="fa fa-address-book"></i> Customers</a></li>
         <li><a href="reports.php"><i class="fa fa-book"></i> Reports</a></li>
         <li><a href="users.php"><i class="fa fa-users"></i> User Management</a></li>
@@ -108,14 +112,69 @@ $custord=mysqli_num_rows($ords);
 <div class="col-lg-10">
     <!-- Right -->
 
-    <a href="#"><strong><span class="fa fa-check-square-o"></span> Customer Orders</strong></a>
+    <a href="supplier.php"><strong><span class="fa fa-truck"></span> Suppliers</strong></a> <label> <span class="fa fa-caret-right"></span> </label> <a href="#"><strong><span class="fa fa-user"></span> View product</strong></a>
     <hr>
     <div class="col-sm-12">
   <div class="panel panel-danger">
     <div class="panel-heading"></div>
     <div class="panel-body">
-       
-                </div>
+       <div class="row">
+                            <form method="post">            
+                            <input type="hidden" name="supplier_ID" id="supplier_ID" class="form-control">
+                          
+                           <div class="col-sm-1"></div>
+                           <div class="col-sm-10">
+                             <div class="table-responsive">
+                             <table class="table table-hover">
+                               <thead>
+                                 <tr>
+                                   <th>Name</th>
+                                   <th>Barcode</th>
+                                   <th>Standard Price</th>
+                                   <th>List Price</th>
+                                 </tr>
+                               </thead>
+                               <tbody>
+                              <?php
+                                    
+                          $display_users=mysqli_query($open_connection,"SELECT * FROM tbl_products WHERE supplier_ID = '$sesID'") or die(mysqli_error($open_connection));
+                          
+                            $i=1;
+                            while($row=mysqli_fetch_array($display_users)){
+                              $supplier_ID=$row['supplier_ID'];
+                                $product_name=$row['product_name'];
+                                $barcode=$row['barcode'];
+                                $standard_price=$row['standard_price'];
+                                $list_price=$row['list_price'];
+                             
+                            
+                        ?>
+                               </tbody>
+                                <tr>
+                                  <td><?php echo $product_name ?></td>
+                                  <td><?php echo $barcode ?></td>
+                                  <td><?php echo $standard_price ?></td>
+                                  <td><?php echo $list_price ?></td>
+                                </tr>
+                                <?php } ?>
+                             </table>
+                           </div>
+                           </div>
+                           <div class="col-sm-1"></div>
+
+
+
+
+                        </div>
+                          </div>
+
+                          </form>
+                            </div>
+
+
+
+
+    </div>
     </div>
   </div>
 </div>

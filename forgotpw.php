@@ -9,21 +9,23 @@
         $aemail=$_POST['email'];
 
 
-        $display_users=mysqli_query($open_connection,"SELECT * FROM tbl_users WHERE email='$aemail'") or die(mysql_error());
+        $display_users=mysqli_query($open_connection,"SELECT * FROM tbl_user WHERE email='$aemail'") or die(mysql_error());
         $count = mysqli_num_rows($display_users);
         if ($count==0) 
         {
                 echo "<script type='text/javascript'>alert('There is no user with this e-mail !');</script>";    
-                        }
-            else{
+        }
+        else{
                         echo "<script type='text/javascript'>alert('Email and Password Successfully Send!');</script>";
                         while($row=mysqli_fetch_array($display_users)){
+                            $i= $row['id'];
                             $username=$row['username'];
                             $fname=$row['firstname'];
                             $lname=$row['lastname'];
                             $password=$row['password'];
-
-                 $query=mysqli_query($open_connection,"SELECT * FROM tbl_users Where username ='$username' AND password = '$password'") or die(mysql_error());
+                            $email=$row['email'];
+                        
+                 $query=mysqli_query($open_connection,"SELECT * FROM tbl_user Where username ='$username' AND password = '$password'") or die(mysql_error());
 
                             
                     
@@ -32,7 +34,8 @@
     /*$message=   
             'Username: '.$username.'<br> 
             Password: '.$password;*/
-    $message='Dear '.$fname.' '.$lname.',<br> A request has been sent to reset your password. Please click the following link to reset your password.<br>www.tumblr.com';
+
+    $message='Dear '.$fname.' '.$lname.',<br> A request has been sent to reset your password. Please the following link to reset your Password. <br> Here\'s the link to reset to the default password:<br> localhost/ecnd_new/reset_pass.php?q='.$i.'' ;
     require "phpmailer/class.phpmailer.php"; //include phpmailer class
       
     // Instantiate Class  
@@ -68,32 +71,6 @@
 
 ?>
 
-
-<!DOCTYPE html>
-<html>
- <head>
-    <title>FORGOT PASSWORD!</title>
-    <meta charset="utf-8"> 
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <script src="Assets/js/jquery-1.10.2.min.js"></script>
-    <!-- Sources -->
-    <link rel="stylesheet" type="text/css" href="Assets/font-awesome/css/font-awesome.min.css" />
-    <link rel="stylesheet" href="Assets/bootstrap/css/admin_style.css"/>
-    <link rel="stylesheet" href="Assets/bootstrap/css/bootstrap.css"/>
-    <script src="Assets/js/admin_style.js"></script>
-    <script src="Assets/bootstrap/js/jquery.min.js"></script>
-    <script src="Assets/bootstrap/js/bootstrap.js"></script>
-
-    <script type="text/javascript">
-        function sent_confirmation()
-        {
-            alert("Successfully Sent")
-        }
-    </script>
-
-  </head>
-  
-
 <!DOCTYPE html>
 <html>
 <head>
@@ -103,47 +80,60 @@
 
     <link rel="stylesheet" type="text/css" href="Assets/bootstrap/css/bootstrap.min.css" />
     <link rel="stylesheet" type="text/css" href="Assets/font-awesome/css/font-awesome.min.css" />
-
     <script type="text/javascript" src="Assets/js/jquery-1.10.2.min.js"></script>
     <script type="text/javascript" src="Assets/bootstrap/js/bootstrap.min.js"></script>
+     <script type="text/javascript">
+        function sent_confirmation()
+        {
+            alert("Successfully Sent")
+        }
+    </script>
 </head>
 <body style="background-color:#aa0e15">
 
-    <!-- Page Content -->
-        <!-- Portfolio Grid Section -->
-    <section id="login">
-     
+<div class="main">
+    <div class="container">
+        <center>
+        <div class="container1">
+        <h1>FORGOT PASSWORD</h1>
+        </div>
+            <div class="middle">
                 
-   <div class="container" >
-    <div class="card card-container" style="background-color: #d9c5c6;opacity: 20;">
-        <img id="logo-img" class="logo-img" src="Assets/Images/EC.png"/>
-        <form role="form" class="form-signin"  method="post" id="login">
-                        <label style="font-size: 18px;margin-top: 10px">Email Address</label>
-                        <input type="email" name="email" class="form-control" placeholder="xxx@gmail.com" required="">
-                     <button type="submit" name="send" class="btn btn-primary btn-lg" > Send</button>
-                     <button type="reset" name="clear" class="btn btn-default btn-lg"  value="Cancel" > Clear</button>
-                    
-            
+
+                <div class="login">
+                    <form  role="form" class="form-signin"  method="post" id="login">
+                        <div class="col-sm-12">
+                          <div class="col-sm-2"></div>
+                          <div class="col-md-6" style="margin-bottom: 10px;">
+                         <div class="input-group">
+                            <span class="input-group-addon"> <i class="fa fa-envelope-o"></i></span>
+                              <input type="email" name="email" class="form-control" placeholder="xxx@gmail.com" required="">  
+                          </div>
+                        </div>
+                        <div class="col-sm-2"><button type="submit" name="send" class="btn btn-danger btn-block" > Send</button></div>
+                        
+                        </div>
+                        <div class="col-sm-12">
+                          <div class="col-sm-5"></div>
+                          <div class="col-sm-2" style="margin-top: 10px;">
+                          <a href="index.php" class="back"><span class="fa fa-lock"></span> Back to login page</a>
+                        </div>
+                          <div class="col-sm-5"></div>
+                        </div>
+
+                      
                       <span class="help-block" id="erruser" style="display: none;font-size: 9px;color: #fff;margin-left: 600px;margin-top: 350px;"></span>
                     <span class="help-block" id="pwordlmt" style="display: none;font-size: 9px;color: #fff;margin-left: 900px;">    </span>
-                    </form>
-        </div>
-        </div>
-                
-                   
-            </div>
-         </div>    
-        </div>         
-    
-</section>
 
-        <!-- Footer -->
+                </div> <!-- end login -->
       
 
-    <!-- /.container -->
-
-    <!-- jQuery -->
-    <script src="js1/jquery.js"></script>
+                </form>
+            </div>
+        </center>
+    </div>
+</div>
+  <script src="js1/jquery.js"></script>
 
     <!-- Bootstrap Core JavaScript -->
     <script src="js1/bootstrap.min.js"></script>
@@ -220,69 +210,62 @@ function showPass(val){
 
     
 
-</body>
-
-</html>
-<style>
-.card-container.card {
-    max-width: 350px;
-    padding: 40px 40px;
-    height: 400px;
+<style type="text/css">
+    @charset "utf-8";
+div.main{
+background-image: url("Assets/Images/bg2.jpg");
+background-repeat: no-repeat;
+background-position: center;
+background-attachment: fixed;
+opacity: 20;
+height:calc(100vh);
+width:100%;
+color:white;
 }
 
-/*
- * Card
- */
-.card {
-    background-color: #F7F7F7;
-    /* just in case there no content*/
-    padding: 20px 25px 30px;
-    margin: 0 auto 25px;
-    margin-top: 50px;
-    /* shadows and rounded borders */
-    -moz-border-radius: 2px;
-    -webkit-border-radius: 2px;
-    border-radius: 2px;
-    -moz-box-shadow: 0px 2px 2px rgba(0, 0, 0, 0.3);
-    -webkit-box-shadow: 0px 2px 2px rgba(0, 0, 0, 0.3);
-    box-shadow: 0px 2px 2px rgba(0, 0, 0, 0.3);
+[class*="fontawesome-"]:before {
+  font-family: 'FontAwesome', sans-serif;
 }
 
-.logo-img {
-    width: 180px;
-    height: 180px;
-    margin: 0 auto;
-    margin-top: -40px;
-    display: block;
-}
+/* ---------- GENERAL ---------- */
 
-.form-signin #username,
-.form-signin #password {
-    direction: ltr;
-    height: 44px;
-    font-size: 16px;
-}
+* {
+  box-sizing: border-box;
+    margin:0px auto;
 
-.form-signin input[type=email],
-.form-signin input[type=password],
-.form-signin input[type=text],
-.form-signin button {
-    width: 100%;
-    display: block;
-    margin-bottom: 10px;
-    z-index: 1;
-    position: relative;
-    -moz-box-sizing: border-box;
-    -webkit-box-sizing: border-box;
+  &:before,
+  &:after {
     box-sizing: border-box;
+  }
+
+}
+.back{
+  color:white;
+text-decoration: none;
+font-size: 12px;
+
+}
+.back:hover{
+  color:red;
+  text-decoration: none;
+}
+body {
+   
+  color: #606468;
+  font: 87.5%/1.5em 'Open Sans', sans-serif;
+  margin: 0;
 }
 
-.form-signin .form-control:focus {
-    border-color: rgb(104, 145, 162);
-    outline: 0;
-    -webkit-box-shadow: inset 0 1px 1px rgba(0,0,0,.075),0 0 8px rgb(104, 145, 162);
-    box-shadow: inset 0 1px 1px rgba(0,0,0,.075),0 0 8px rgb(104, 145, 162);
+.login{
+  margin-top:50px;
+}
+.container1{
+  padding-top: 100px;
+}
+i{
+  color:red;
 }
 </style>
 
-
+</body>
+</html>

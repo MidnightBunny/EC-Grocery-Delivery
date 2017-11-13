@@ -1,3 +1,5 @@
+<link href="Assets/css/sweetalert.css" rel="stylesheet" />
+ <script src="Assets/js/sweetalert.min.js"></script>
 <?php
 
 include'connection.php';
@@ -7,13 +9,13 @@ $username=$_POST['username'];
 $password=$_POST['password'];
 $pass = md5($password);
 
-$query1="SELECT * from tbl_users WHERE username='$username' AND password='$pass'";
+$query1="SELECT * from tbl_user WHERE username='$username' AND password='$pass'";
 $result1=mysqli_query($open_connection,$query1);
 $record=mysqli_num_rows($result1);
 
 
 if($record==1){
-	$query2="SELECT * from tbl_users WHERE username='$username' AND password='$password'";
+	$query2="SELECT * from tbl_user WHERE username='$username' AND password='$pass'";
 	$result2=mysqli_query($open_connection,$query1);
 
 	while(list($id,$firstname,$lastname,$username,$password,$userlevel,$image)=mysqli_fetch_array($result2))
@@ -48,6 +50,7 @@ if($record==1){
 		else if($auserlevel=='Admin'){
 		echo"
 			<script type='text/javascript'>
+				alert('Successfully logged in!')
 				open('dashboard.php','_self');
 			</script>
 		";	
@@ -55,7 +58,8 @@ if($record==1){
 		else if($auserlevel=='Cashier'){
 		echo"
 			<script type='text/javascript'>
-				open('cashier.php','_self');
+				alert('Successfully logged in!')
+				open('cashierdashboard.php','_self');
 			</script>
 		";	
 		}
@@ -69,7 +73,7 @@ if($record==1){
 		else if($auserlevel=='Courier'){
 		echo"
 			<script type='text/javascript'>
-				open('merchandiser.php','_self');
+				alert('Mobile Log in only!')
 			</script>
 		";	
 		}

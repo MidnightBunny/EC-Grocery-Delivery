@@ -85,6 +85,7 @@ include 'connection.php';
       $sp=$_POST['StandardPrice'];
       $lp=$_POST['ListPrice'];
       $PDesc=$_POST['Description'];
+
       $warning_level=$_POST['warning_level'];
       $ds=$_POST['check_dis'];
       if ($ds == 'YES') {
@@ -106,6 +107,7 @@ include 'connection.php';
 
         $n2="UPDATE tbl_stocks SET `warning_level`='$warning_level' WHERE product_ID=$pID";
         mysqli_query($open_connection,$n2);
+
       }
       else{
         move_uploaded_file($_FILES["file"]["tmp_name"], $storedFile);
@@ -167,7 +169,9 @@ $myord=mysqli_num_rows($ord);
       });
     });
     $(function(){
-      $('#num').keypress(function(event) {
+
+      $('.arg').keypress(function(event) {
+
       var charCode = (event.which) ? event.which : event.keyCode
 
       if (
@@ -327,11 +331,13 @@ $myord=mysqli_num_rows($ord);
                     <th name="no-sort">Barcode</th>
                     <th>Product Name</th>
                     <th>Supplier</th>
+
                     <!-- <th>Standard Price</th>
                     <th>List Price</th> -->
                     <th> Category </th>
                     <th>Stocks</th>
                 
+
                     <th>Status</th>
                     <th class="no-sort">Actions</th>
                     
@@ -340,7 +346,9 @@ $myord=mysqli_num_rows($ord);
                 <tr>
                 <?php 
 
+
                        $sql_display="SELECT p.product_ID,p.barcode,p.product_name,available,p.Category_ID,Category_Name,p.SCat_ID,SubCategory_Name,s.supplier_ID,warning_level,supplier_name,standard_price,list_price,discontinue,image,description FROM tbl_products p INNER JOIN tbl_category USING(`Category_ID`) INNER JOIN tbl_subcategory USING (`SCat_ID`) Inner JOIN tbl_supplier s USING (`supplier_ID`) INNER JOIN tbl_stocks USING(`product_ID`) ORDER BY product_ID ASC";
+
 
                           $display_users=mysqli_query($open_connection,$sql_display) or die(mysqli_error($open_connection));
                             $i=1; 
@@ -370,7 +378,7 @@ $myord=mysqli_num_rows($ord);
                   <td><?php echo $lp; ?></td> -->
                   <td><?php echo $cn;?></td>
                   <td><?php echo $qt;?></td>
-                  
+             
                   <td><?php if($disc == 1){echo "Discontinued";}else{echo "Ongoing";} ?></td>
                   
                   <?php //$test = json_encode(array("a"=>$id,"b"=>$bc,"c"=>$pn,"d"=>$cn,"e"=>$scn,"f"=>$sp,"g"=>$lp,"h"=>$disc,"i"=>$img_display)); ?>
@@ -393,7 +401,9 @@ $myord=mysqli_num_rows($ord);
                    
                   </td>
                 </tr>
+
 <!-----VIEW PRODUCT---!>
+
     
               <div id="viewModal<?php echo $id; ?>" class="modal fade" role="dialog">
                  <div class="modal-dialog">
@@ -453,12 +463,14 @@ $myord=mysqli_num_rows($ord);
                           </div>  
                         </div>
 
+
                           <div class="col-md-6" style="margin-bottom: 10px;">
                          <div class="input-group">
                               <span class="input-group-addon">Warning Level </span>
                                 <input type="text" class="form-control" id="WLvl" name="quantity" placeholder="Waring Level" tabindex="8" value="<?php echo $WLvl; ?>" style="background-color:white;" readonly>
                           </div>  
                         </div>
+
 <div class="col-md-12" style="margin-bottom: 10px;">
                          <div class="input-group">
                               
@@ -497,6 +509,7 @@ $myord=mysqli_num_rows($ord);
                                 <input type="text" class="form-control" id="barcode" name="barcode" placeholder="Barcode" onmouseover="this.focus();" tabindex="1" onKeyPress="return number(event)" value="<?php echo $bc; ?>">  
                               
                               <label>Product Name</label>   
+
                               <input type="text" class="form-control" id="ProductName" name="ProductName" placeholder="Product Name" tabindex="2" value="<?php echo $pn; ?>">
                                 
                                  <label>Standard Price</label>
@@ -505,7 +518,7 @@ $myord=mysqli_num_rows($ord);
                                   <label>Warning Level</label>
                                   <input type="text" class="form-control" id="warning_level" name="warning_level" placeholder="Warning Level" tabindex="4" onKeyPress="return number3(event)" value="<?php echo $WLvl; ?>">
                                   <br>
-                                
+             
                                 
                           </div>
                           <div class="col-md-6">
@@ -549,7 +562,9 @@ $myord=mysqli_num_rows($ord);
                               </select>
 
                                <label >List Price</label>
-                                <input type="text" class="form-control" id="num2" name="ListPrice" placeholder="List Price" tabindex="8" onKeyPress="return number3(event)" value="<?php echo $lp; ?>">
+
+                                <input type="text" class="form-control arg" id="" name="ListPrice" placeholder="List Price" tabindex="8" onKeyPress="return number3(event)" value="<?php echo $lp; ?>">
+
                               <br>
                             </div>
 
