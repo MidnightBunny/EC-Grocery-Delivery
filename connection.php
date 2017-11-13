@@ -1,6 +1,6 @@
 <?php
 //name the database
-$db_name="dbecnewdeal";
+$db_name="ecnd_db";
 //open the connection
 $open_connection=mysqli_connect("localhost","root","") or die(mysqli_error($open_connection));
 //select your database
